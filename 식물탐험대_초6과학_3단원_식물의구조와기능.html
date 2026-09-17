@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>식물 탐험대 · 초6 과학 식물의 구조와 기능</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --leaf:#2e7d32; --leaf-dark:#1b5e20; --root:#8d6e63; --root-dark:#5d4037; --flower:#d81b60; --flower-dark:#ad1457;
+  --bg1:#eaf6ea; --bg2:#fdf3e7; --card:#ffffff; --ink:#26301f; --sub:#6b7a63;
+  --good:#2e8b57; --warn:#e0862b; --gold:#d4a017; --line:#e1ecdd;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Noto Sans KR',sans-serif;color:var(--ink);
+  background:linear-gradient(160deg,var(--bg1) 0%, #fbf7ea 45%, var(--bg2) 100%);
+  min-height:100vh;padding-bottom:40px;}
+.wrap{max-width:640px;margin:0 auto;padding:18px 16px 60px;}
+.hero{text-align:center;padding:18px 10px 6px;}
+.hero .eyebrow{font-size:13px;color:var(--leaf);font-weight:700;letter-spacing:.5px;}
+.hero h1{font-family:Georgia,'Nanum Myeongjo','Batang',serif;font-size:32px;margin:4px 0 6px;
+  background:linear-gradient(90deg,var(--leaf),var(--flower));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.hero p{font-size:13px;color:var(--sub);margin:0 0 14px;}
+.gauge{height:10px;border-radius:6px;background:linear-gradient(90deg,var(--root),#e3d3b8,var(--leaf),#3fae6a);position:relative;margin-bottom:4px;}
+.gauge .mark{position:absolute;top:-4px;width:3px;height:18px;background:#26301f;border-radius:2px;}
+.gauge-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-bottom:16px;}
+.card{background:var(--card);border-radius:22px;box-shadow:0 10px 30px rgba(46,125,50,.09);padding:22px 20px;margin-bottom:16px;}
+h2.card-title{font-family:Georgia,'Nanum Myeongjo','Batang',serif;font-size:22px;margin:0 0 14px;color:var(--leaf-dark);}
+label.field-label{display:block;font-size:14px;font-weight:700;margin:14px 0 6px;color:var(--ink);}
+input[type=text]{width:100%;padding:14px;border-radius:14px;border:1.5px solid #d8e6d3;font-size:16px;background:#f8fbf6;}
+input[type=text]:focus{outline:2px solid var(--leaf);}
+.chip-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;}
+.chip{border:1.5px solid #d8e6d3;border-radius:14px;padding:12px;text-align:center;cursor:pointer;background:#f8fbf6;transition:.15s;}
+.chip b{display:block;font-size:14px;}
+.chip small{color:var(--sub);font-size:11px;}
+.chip.active{border-color:var(--leaf);background:#e9f6ea;box-shadow:0 0 0 2px rgba(46,125,50,.15) inset;}
+.toggle-row{display:flex;align-items:center;gap:8px;margin:12px 0;font-size:14px;}
+.toggle-row input{width:18px;height:18px;}
+.mode-card{border:1.5px solid #d8e6d3;border-radius:16px;padding:14px 16px;margin-bottom:10px;cursor:pointer;background:#f8fbf6;}
+.mode-card.active{border-color:var(--leaf);background:#e9f6ea;box-shadow:0 0 0 2px rgba(46,125,50,.15) inset;}
+.mode-card .mt{font-weight:700;font-size:15px;}
+.mode-card .md{font-size:12px;color:var(--sub);margin-top:2px;}
+.mission{background:linear-gradient(90deg,#43a047,#2e7d32);color:#fff;border-radius:16px;padding:16px;text-align:center;font-weight:700;font-size:15px;margin:14px 0;cursor:pointer;}
+.btn{display:block;width:100%;text-align:center;padding:16px;border-radius:16px;font-weight:800;font-size:16px;border:none;cursor:pointer;text-decoration:none;box-sizing:border-box;}
+.btn-primary{background:linear-gradient(90deg,var(--leaf),var(--leaf-dark));color:#fff;box-shadow:0 8px 18px rgba(46,125,50,.28);}
+.btn-outline{background:#fff;border:1.6px solid var(--leaf);color:var(--leaf-dark);}
+.btn-ghost{background:#eef3ec;color:var(--ink);}
+.row2{display:flex;gap:10px;margin-top:10px;}
+.row2 .btn{flex:1;}
+.small-note{font-size:12px;color:var(--sub);text-align:center;margin-top:10px;}
+.tag{display:inline-block;background:#e9f6ea;color:var(--leaf-dark);font-weight:700;font-size:13px;padding:6px 12px;border-radius:20px;margin-bottom:10px;}
+.meta-row{display:flex;justify-content:space-between;font-size:13px;color:var(--sub);margin-bottom:8px;}
+.timerbar-outer{height:8px;background:#e6efe3;border-radius:5px;overflow:hidden;margin-bottom:14px;}
+.timerbar-inner{height:100%;background:linear-gradient(90deg,var(--leaf),var(--flower));transition:width 1s linear;}
+.qtext{font-size:19px;font-weight:700;line-height:1.5;margin:8px 0 18px;}
+.choice{border:1.6px solid #d8e6d3;border-radius:16px;padding:16px;margin-bottom:10px;font-size:15px;cursor:pointer;background:#f8fbf6;}
+.choice.sel{border-color:var(--root);background:#f2ece5;}
+.choice.correct{border-color:var(--good);background:#e7f6ec;}
+.choice.wrong{border-color:#c0392b;background:#fdeceb;}
+.choice.locked{background:#e3e6df;border-color:#c7cdc0;color:#15190f;cursor:not-allowed;}
+.lock-note{font-size:12px;font-weight:700;margin-top:2px;}
+.lock-note.wait{color:var(--warn);}
+.lock-note.go{color:var(--leaf-dark);}
+.lock-countdown{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:#f6f4ee;border:3px dashed #d8cfa8;border-radius:18px;padding:10px 14px 14px;margin:4px 0 14px;font-weight:800;color:#a8631a;font-size:14px;transition:.2s;}
+.lock-countdown .num{font-size:64px;font-weight:900;font-family:Georgia,'Nanum Myeongjo','Batang',serif;color:var(--flower-dark);min-width:60px;text-align:center;line-height:1;}
+.lock-countdown .go-emoji{font-size:44px;line-height:1;}
+.lock-countdown.go{color:var(--leaf-dark);border-color:var(--leaf);background:#eaf6ea;border-style:solid;}
+.scope-row{display:flex;gap:8px;margin:6px 0 2px;}
+.scope-chip{flex:1;border:1.5px solid #d8e6d3;border-radius:12px;padding:9px 6px;text-align:center;font-size:12.5px;font-weight:700;cursor:pointer;background:#f8fbf6;color:var(--sub);}
+.scope-chip.active{border-color:var(--leaf);background:#e9f6ea;color:var(--leaf-dark);}
+.hist-item{border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:10px;cursor:pointer;background:#f8fbf6;}
+.hist-item:active{background:#eef3ec;}
+.hist-top{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:14px;}
+.hist-sub{font-size:12px;color:var(--sub);margin-top:4px;}
+.explain-box{background:#fdeceb;border-radius:14px;padding:14px 16px;font-size:14px;line-height:1.6;margin:10px 0 16px;}
+.explain-box.right{background:#e7f6ec;}
+.explain-box b{display:block;margin-bottom:6px;font-size:15px;}
+.giveup{display:block;text-align:center;color:var(--sub);font-size:13px;margin-top:14px;text-decoration:underline;cursor:pointer;}
+.combo-pop{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) scale(0.7);background:linear-gradient(135deg,var(--gold),#f3c94a);color:#5a3d00;font-weight:900;font-size:26px;padding:22px 34px;border-radius:24px;box-shadow:0 20px 40px rgba(0,0,0,.25);z-index:999;opacity:0;transition:.25s;text-align:center;}
+.combo-pop.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+.score-big{text-align:center;font-family:Georgia,'Nanum Myeongjo','Batang',serif;font-size:54px;font-weight:700;color:var(--leaf-dark);margin:6px 0 2px;}
+.score-sub{text-align:center;color:var(--sub);font-size:14px;margin-bottom:14px;}
+.fanfare{text-align:center;font-weight:900;font-size:19px;border-radius:16px;padding:16px;margin:14px 0;}
+.fanfare.f80{background:#fdf2e3;color:#a8631a;}
+.fanfare.f90{background:#e9f6ea;color:var(--leaf-dark);}
+.fanfare.f95{background:#fde8f0;color:var(--flower-dark);}
+.fanfare.f100{background:linear-gradient(135deg,#ffe27a,#ffb648);color:#6b3d00;}
+.point-box{display:flex;justify-content:space-between;align-items:center;background:#f2f6ef;border-radius:14px;padding:14px 16px;margin:10px 0;font-size:14px;}
+.point-box b{color:var(--leaf-dark);font-size:16px;}
+.level-pill{background:#e9f6ea;color:var(--leaf-dark);font-weight:700;font-size:13px;padding:8px 14px;border-radius:20px;display:inline-block;margin-top:6px;}
+.coupon-toast{background:linear-gradient(135deg,#ffd9a0,#ffb648);border-radius:16px;padding:16px;text-align:center;font-weight:800;color:#6b3d00;margin:14px 0;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th,td{padding:8px 6px;text-align:center;border-bottom:1px solid var(--line);}
+th{color:var(--sub);font-weight:700;background:#f6faf4;}
+.tabbar{display:flex;gap:4px;border-bottom:2px solid var(--line);margin-bottom:14px;overflow-x:auto;}
+.tabbtn{flex:1;text-align:center;padding:10px 4px;font-size:13px;font-weight:700;color:var(--sub);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;}
+.tabbtn.active{color:var(--leaf-dark);border-color:var(--leaf);}
+.month-head{background:#f2f6ef;border-radius:12px;padding:12px 14px;margin-bottom:6px;font-weight:700;display:flex;justify-content:space-between;cursor:pointer;}
+.warnbox{background:#fdf2e3;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#7a5a1a;margin-bottom:14px;}
+.hidden{display:none !important;}
+.modal-overlay{position:fixed;inset:0;background:rgba(20,30,15,.5);display:flex;align-items:center;justify-content:center;z-index:1200;padding:24px;}
+.modal-overlay.hidden{display:none !important;}
+.modal-box{background:#fff;border-radius:20px;padding:24px 20px;max-width:340px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.3);}
+.modal-box p{font-size:15px;line-height:1.6;margin:0 0 18px;text-align:center;color:var(--ink);white-space:pre-line;}
+.spinner{display:inline-block;width:32px;height:32px;border:4px solid #dceada;border-top-color:var(--leaf);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.footer-copy{text-align:center;color:#a9b7a3;font-size:12px;margin-top:20px;}
+.hof-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);}
+.hof-rank{width:28px;height:28px;border-radius:50%;background:#f2f6ef;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:var(--leaf-dark);}
+.hof-rank.gold{background:#ffd54f;color:#6b3d00;}
+.hof-rank.silver{background:#d8d8d8;}
+.hof-rank.bronze{background:#e0ad7a;color:#4a2b00;}
+.kbdinput{width:100%;padding:14px;border-radius:14px;border:1.6px solid var(--leaf);font-size:16px;margin-bottom:14px;background:#eef8ee;}
+.wrongitem{border:1.5px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;}
+.wrongitem .wq{font-weight:700;margin-bottom:6px;}
+.wrongitem .wa{color:var(--good);font-weight:700;font-size:13px;}
+.wrongitem .wu{color:#c0392b;font-size:13px;}
+@media print{
+  body *{visibility:hidden;}
+  #printArea, #printArea *{visibility:visible;}
+  #printArea{position:absolute;left:0;top:0;width:100%;}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<div class="combo-pop" id="comboPop"></div>
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal-box">
+    <p id="modalMsg"></p>
+    <div class="row2" id="modalBtns"></div>
+  </div>
+</div>
+
+<script>
+/* ============ QUESTION BANK ============ */
+const CATS = [
+  {id:'cell', name:'세포', icon:'🔬'},
+  {id:'root', name:'뿌리', icon:'🌱'},
+  {id:'stem', name:'줄기', icon:'🌿'},
+  {id:'leaf', name:'잎과 광합성', icon:'🍃'},
+  {id:'transpire', name:'증산 작용', icon:'💧'},
+  {id:'flower', name:'꽃', icon:'🌸'},
+];
+
+function M(c,q,o,a,e){return {c,t:'mcq',q,o,a,e};}
+function S(c,q,a,e){return {c,t:'short',q,a,e};}
+
+const QUESTIONS = [
+/* ===== 세포 ===== */
+M('cell','생물을 이루는 기본 단위는 무엇인가?',['세포','조직','기관','개체'],0,'세포는 생물을 이루는 기본 단위예요.'),
+M('cell','세포에 대한 설명으로 옳은 것은?',['모든 세포는 맨눈으로 쉽게 보인다','세포는 대부분 크기가 매우 작아 맨눈으로 관찰하기 어렵다','세포는 종류에 관계없이 크기와 모양이 같다','세포는 식물에만 있다'],1,'세포는 대부분 크기가 매우 작지만, 개구리알처럼 맨눈으로 볼 수 있는 큰 세포도 있어요.'),
+M('cell','하나의 세포로 이루어진 생물의 예로 옳은 것은?',['강아지','짚신벌레','소나무','사람'],1,'짚신벌레와 아메바는 하나의 세포로만 이루어진 생물이에요.'),
+M('cell','세포를 관찰하려면 반드시 필요한 도구는?',['자','현미경','온도계','저울'],1,'세포는 크기가 매우 작아 현미경으로 확대해야 관찰할 수 있어요.'),
+M('cell','현미경에서 눈으로 보는 렌즈로 관찰 대상을 확대하는 부분은?',['대물렌즈','접안렌즈','재물대','조리개'],1,'접안렌즈는 눈으로 보는 렌즈로 관찰 대상을 확대해요.'),
+M('cell','현미경에서 관찰 대상의 모습을 확대하는 렌즈는?',['접안렌즈','대물렌즈','조명','회전판'],1,'대물렌즈는 관찰 대상의 모습을 확대해요.'),
+M('cell','현미경표본을 올려놓는 곳은?',['재물대','조리개','회전판','조명'],0,'재물대는 현미경표본을 올려놓는 곳이에요.'),
+M('cell','현미경에서 대물렌즈의 배율을 조절하는 부분은?',['조동 나사','미동 나사','회전판','조리개'],2,'회전판은 대물렌즈의 배율을 조절해요.'),
+M('cell','관찰 대상에 초점을 대략적으로 맞추는 나사는?',['조동 나사','미동 나사','재물대','조명'],0,'조동 나사는 관찰 대상에 초점을 대략적으로 맞춰요.'),
+M('cell','관찰 대상에 초점을 정확하게 맞추는 나사는?',['조동 나사','미동 나사','조리개','회전판'],1,'미동 나사는 관찰 대상에 초점을 정확하게 맞춰요.'),
+M('cell','빛의 양을 조절하는 현미경의 부분은?',['조리개','재물대','회전판','접안렌즈'],0,'조리개는 빛의 양을 조절해요.'),
+S('cell','접안렌즈 배율이 5배, 대물렌즈 배율이 40배일 때 현미경의 배율은 몇 배인지 숫자로 쓰시오.','200','현미경의 배율은 접안렌즈 배율×대물렌즈 배율이에요. 5×40=200배예요.'),
+M('cell','식물 세포 안에 있는 둥근 구조로 세포의 생명 활동을 조절하는 것은?',['세포막','핵','세포벽','세포질'],1,'핵은 세포의 생명 활동을 조절해요.'),
+M('cell','세포 안팎으로 물질이 드나드는 것을 조절하는 것은?',['핵','세포막','세포벽','엽록체'],1,'세포막은 세포 안팎으로 물질이 드나드는 것을 조절해요.'),
+M('cell','세포막의 바깥쪽을 둘러싸며 식물 세포를 보호하고 모양을 유지하는 것은?',['세포막','핵','세포벽','액포'],2,'세포벽은 식물 세포를 보호하고 모양을 유지해요.'),
+M('cell','동물 세포에는 없고 식물 세포에는 있는 구조는?',['핵','세포막','세포벽','세포질'],2,'세포벽은 식물 세포에만 있고 동물 세포에는 없어요.'),
+M('cell','양파 표피세포를 관찰할 때 핵을 붉게 염색하기 위해 사용하는 용액은?',['증류수','아세트산 카민 용액','소금물','설탕물'],1,'아세트산 카민 용액은 핵을 붉은색으로 염색해요.'),
+M('cell','양파 표피세포를 관찰한 결과로 옳지 않은 것은?',['세포가 각진 모양이다','세포들이 빈틈없이 붙어 있다','세포마다 둥근 핵이 있다','세포벽이 없다'],3,'양파 표피세포는 식물 세포이므로 세포벽이 있어요.'),
+S('cell','식물 세포를 보호하고 식물 세포의 모양을 유지하는, 세포막 바깥을 둘러싼 구조를 무엇이라 하는지 쓰시오.','세포벽','세포벽은 식물 세포를 보호하고 모양을 유지해요.'),
+M('cell','눈으로 볼 수 있을 만큼 큰 세포의 예로 옳은 것은?',['적혈구','개구리알','백혈구','세균'],1,'개구리알, 달걀, 신경세포처럼 맨눈으로 볼 수 있을 만큼 큰 세포도 있어요.'),
+M('cell','광학 현미경에서 빛을 비추는 부분은?',['조명','조리개','재물대','회전판'],0,'조명은 빛을 비추는 부분이에요.'),
+M('cell','양파 표피세포 표본을 만들 때 표피를 벗겨내는 데 사용하는 도구로 옳은 것은?',['칼과 핀셋','저울','온도계','자'],0,'칼로 금을 긋고 핀셋을 이용해 표피를 떼어 내요.'),
+M('cell','표본을 만들 때 덮개 유리를 천천히 기울여 덮는 까닭은?',['빛을 막기 위해','공기 방울이 생기지 않게 하기 위해','색을 내기 위해','세포를 없애기 위해'],1,'공기 방울이 생기지 않게 천천히 덮어야 관찰이 잘돼요.'),
+M('cell','현미경 관찰을 시작할 때 가장 먼저 하는 일은?',['미동 나사로 초점을 맞춘다','배율이 가장 낮은 대물렌즈가 가운데 오도록 회전판을 돌린다','아세트산 카민 용액을 떨어뜨린다','표본을 인쇄한다'],1,'회전판을 돌려 배율이 가장 낮은 대물렌즈가 가운데 오도록 한 뒤 관찰을 시작해요.'),
+M('cell','현미경표본과 대물렌즈를 가깝게 할 때 조심해야 할 것은?',['렌즈가 깨지지 않게 한다','표본과 대물렌즈가 닿지 않게 한다','빛이 새지 않게 한다','표본이 마르지 않게 한다'],1,'현미경표본과 대물렌즈가 닿지 않도록 조심해야 해요.'),
+M('cell','접안렌즈로 보면서 조동 나사로 하는 일은?',['빛의 양을 조절한다','관찰 대상을 찾는다','표본을 염색한다','배율을 계산한다'],1,'조동 나사로 관찰 대상을 찾은 뒤 미동 나사로 초점을 정확히 맞춰요.'),
+M('cell','양파 표피세포 관찰 결과로 옳은 것은?',['세포가 둥근 모양이다','세포가 각진 모양이다','세포 사이에 빈틈이 많다','핵이 없다'],1,'양파 표피세포는 각진 모양이고 세포들이 빈틈없이 붙어 있어요.'),
+M('cell','세포가 붉은색이나 푸른색을 띠는 까닭은?',['원래 그 색이라서','염색액으로 염색했기 때문에','빛을 받아서','물을 흡수해서'],1,'세포가 붉은색이나 푸른색을 띠는 까닭은 염색액으로 염색했기 때문이에요.'),
+M('cell','옥수수 뿌리 세포와 자주달개비 잎 세포에서 공통으로 관찰되는 것은?',['세포벽만','핵','뿌리털','기공'],1,'옥수수 뿌리 세포와 자주달개비 잎 세포 모두 핵이 관찰돼요.'),
+M('cell','사철나무잎의 표피로도 현미경표본을 만들어 관찰할 수 있는가?',['있다','없다','양파만 가능하다','뿌리에서만 가능하다'],0,'사철나무잎의 표피로도 현미경표본을 만들어 관찰할 수 있어요.'),
+M('cell','현미경 관찰 실험에서 아세트산 카민 용액을 떨어뜨리고 반대쪽에 거름종이를 대는 까닭은?',['빛을 차단하려고','세포를 염색하기 위해 용액이 표본에 잘 퍼지도록','물을 없애기 위해','표본을 말리기 위해'],1,'거름종이로 반대쪽을 당겨 염색액이 표본 전체에 퍼지도록 해요.'),
+S('cell','현미경에서 빛의 양을 조절하는 부분의 이름을 쓰시오.','조리개','조리개는 빛의 양을 조절해요.'),
+S('cell','식물 세포에서 세포 안팎으로 물질이 드나드는 것을 조절하는 얇은 막을 무엇이라 하는지 쓰시오.','세포막','세포막은 세포 안팎으로 물질이 드나드는 것을 조절해요.'),
+
+/* ===== 뿌리 ===== */
+M('root','뿌리는 식물의 어느 부분에 있는가?',['윗부분','아랫부분','가운데','꼭대기'],1,'뿌리는 식물의 아랫부분에 있어요.'),
+M('root','뿌리는 대부분 어디에서 자라는가?',['땅 위','땅속','물 위','공중'],1,'뿌리는 대부분 땅속에서 여러 갈래로 자라요.'),
+M('root','뿌리의 겉면에 있는 솜털처럼 가는 것은?',['잎맥','뿌리털','잎자루','꽃잎'],1,'뿌리털은 뿌리의 겉면에 있는 솜털처럼 매우 가는 것이에요.'),
+M('root','뿌리털의 역할로 옳은 것은?',['양분을 만든다','물을 잘 흡수하도록 돕는다','씨를 만든다','광합성을 한다'],1,'뿌리털은 뿌리의 표면적을 넓혀 물을 잘 흡수하도록 도와줘요.'),
+M('root','굵은 뿌리 주변에 가는 뿌리가 여러 개 난 뿌리를 무엇이라 하는가?',['수염뿌리','곧은뿌리','덩이뿌리','뿌리털'],1,'곧은뿌리는 굵고 곧은 뿌리에 가는 뿌리들이 여러 개 나요.'),
+M('root','곧은뿌리를 가진 식물로 옳은 것은?',['벼','파','민들레','옥수수'],2,'민들레, 가지, 고추, 토마토 등은 곧은뿌리를 가져요.'),
+M('root','비슷한 굵기의 뿌리가 수염처럼 여러 개 난 뿌리는?',['곧은뿌리','수염뿌리','덩이줄기','감는줄기'],1,'수염뿌리는 굵은 뿌리가 발달하지 않고 비슷한 굵기의 뿌리가 여러 개 나요.'),
+M('root','수염뿌리를 가진 식물로 옳은 것은?',['토마토','해바라기','벼','민들레'],2,'벼, 파, 옥수수, 강아지풀 등은 수염뿌리를 가져요.'),
+M('root','뿌리가 하는 일로 옳지 않은 것은?',['물을 흡수한다','식물을 지지한다','양분을 저장하기도 한다','꽃가루를 만든다'],3,'꽃가루를 만드는 것은 뿌리가 아니라 꽃의 수술이 하는 일이에요.'),
+M('root','뿌리에 양분을 저장하여 뿌리가 크고 굵어지는 식물로 옳은 것은?',['당근','소나무','나팔꽃','감자'],0,'무, 당근, 고구마는 뿌리에 양분을 저장해요.'),
+M('root','뿌리를 자른 파와 자르지 않은 파를 눈금실린더에 넣고 3일 뒤 관찰했을 때, 물이 더 많이 줄어든 것은?',['뿌리를 자른 파','뿌리를 자르지 않은 파','둘 다 같다','둘 다 변화 없다'],1,'뿌리를 자르지 않은 파가 뿌리로 물을 흡수하여 물이 더 많이 줄어들어요.'),
+M('root','이 실험에서 다르게 한 조건은?',['물의 양','식물의 크기','뿌리의 유무','온도'],2,'이 실험에서 다르게 한 조건은 뿌리의 유무예요.'),
+M('root','이 실험에서 같게 한 조건이 아닌 것은?',['식물의 종류','뿌리의 유무','물의 양','온도'],1,'뿌리의 유무는 다르게 한 조건이고, 나머지는 같게 한 조건이에요.'),
+M('root','담쟁이덩굴의 뿌리가 하는 특별한 일은?',['양분 저장','다른 물체에 부착','호흡','꽃가루받이'],1,'담쟁이덩굴은 뿌리로 다른 식물이나 물체에 부착해요.'),
+M('root','맹그로브 뿌리가 땅 위나 물 위로 뻗어 있는 까닭은?',['양분 저장','부착','호흡','지지만을 위해'],2,'맹그로브는 땅 위나 물 위로 뿌리를 내어 호흡해요.'),
+S('root','뿌리에서 물을 잘 흡수하도록 도와주는, 뿌리 겉면의 가는 털을 무엇이라 하는지 쓰시오.','뿌리털','뿌리털은 뿌리의 표면적을 넓혀 물을 잘 흡수하도록 도와줘요.'),
+M('root','뿌리털은 어떤 뿌리에서 보기 어려운가?',['어린 뿌리','오래된 뿌리','곧은뿌리','수염뿌리'],1,'뿌리털은 오래된 뿌리에서 보기 어려워요.'),
+M('root','물속에 뿌리를 뻗는 식물로 옳은 것은?',['소나무','개구리밥','가지','고추'],1,'개구리밥, 부레옥잠과 같이 물속에 뿌리를 뻗는 식물도 있어요.'),
+M('root','곧은뿌리를 가진 식물이 아닌 것은?',['가지','고추','벼','해바라기'],2,'벼는 수염뿌리를 가진 식물이에요.'),
+M('root','수염뿌리를 가진 식물이 아닌 것은?',['벼','파','갈대','민들레'],3,'민들레는 곧은뿌리를 가진 식물이에요.'),
+M('root','뿌리의 지지 기능을 잘 보여 주는 식물의 예는?',['당근','버드나무','고구마','무'],1,'버드나무는 뿌리가 땅속으로 깊이 뻗어 바람이 세게 불어도 쓰러지지 않아요.'),
+M('root','뿌리의 지지 기능에 대한 설명으로 옳은 것은?',['뿌리가 땅속 깊이 뻗어 있어 바람에도 쓰러지지 않게 한다','물을 저장한다','양분을 만든다','씨를 퍼뜨린다'],0,'뿌리는 땅속 깊이 뻗어 식물이 쓰러지지 않도록 지지해요.'),
+M('root','겨우살이의 뿌리가 하는 일은?',['혼자서 양분을 만든다','다른 식물의 줄기나 가지에 뿌리를 내려 물과 양분을 빨아들인다','물속에서만 자란다','땅속 깊이 뻗어 지지만 한다'],1,'겨우살이는 다른 식물의 줄기나 가지에 뿌리를 내려 물과 양분을 빨아들여요.'),
+M('root','뿌리에서 물의 흡수 실험에서 두 파의 같게 한 조건이 아닌 것은?',['식물의 종류','물의 양','뿌리의 유무','온도'],2,'뿌리의 유무는 다르게 한 조건이에요.'),
+M('root','뿌리를 자른 파에서도 눈금실린더의 물이 조금 줄어드는 까닭은?',['뿌리가 여전히 물을 흡수해서','자른 면에서 물이 흡수되거나 증발하기 때문','온도가 낮아서','빛이 없어서'],1,'뿌리를 자른 면에서 물이 흡수되거나 공기 중으로 물이 증발하기 때문이에요.'),
+M('root','이 실험에서 눈금실린더에 물의 높이를 미리 표시해 두는 까닭은?',['물의 양이 변한 정도를 비교하기 위해','물의 온도를 재기 위해','물의 색을 보기 위해','뿌리 길이를 재기 위해'],0,'처음 물의 높이를 표시해 두어야 3일 뒤 변화를 비교할 수 있어요.'),
+M('root','미래엔, 천재 교과서에서 뿌리 흡수 실험에 사용하는 식물은?',['파','고추','방울토마토','가지'],1,'미래엔, 천재 교과서에서는 고추를 사용해요.'),
+M('root','지학사 교과서에서 뿌리 흡수 실험에 사용하는 식물은?',['파','고추','방울토마토','가지'],2,'지학사 교과서에서는 방울토마토를 사용해요.'),
+M('root','뿌리의 흡수 기능이 잘 나타나도록 돕는 구조는?',['잎맥','뿌리털','꽃받침','기공'],1,'뿌리털이 물을 잘 흡수하도록 도와줘요.'),
+M('root','다음 중 뿌리가 하는 일이 아닌 것은?',['흡수','지지','저장','꽃가루 이동'],3,'꽃가루 이동(꽃가루받이)은 꽃이 하는 일이에요.'),
+M('root','무, 당근, 고구마의 공통점으로 옳은 것은?',['모두 곧은뿌리이다','모두 뿌리에 양분을 저장한다','모두 수염뿌리이다','모두 물속에서 자란다'],1,'무, 당근, 고구마는 뿌리에 양분을 저장하여 뿌리가 크고 굵어요.'),
+S('root','뿌리를 자른 파와 자르지 않은 파 중, 3일 뒤 눈금실린더의 물이 더 많이 줄어든 것은 무엇인지 쓰시오.','뿌리를 자르지 않은 파','뿌리를 자르지 않은 파가 뿌리로 물을 흡수하여 물이 더 많이 줄어들어요.'),
+S('root','뿌리가 땅속으로 깊이 뻗어 식물이 쓰러지지 않도록 하는 뿌리의 기능을 무엇이라 하는지 쓰시오.','지지 기능','뿌리의 지지 기능은 식물이 쓰러지지 않도록 지지해요.'),
+
+/* ===== 줄기 ===== */
+M('stem','줄기는 대부분 어떻게 자라는가?',['땅속으로 깊게','땅 위로 길게','물속으로만','옆으로만'],1,'줄기는 대부분 땅 위로 길게 자라요.'),
+M('stem','줄기에 대한 설명으로 옳은 것은?',['뿌리와 이어져 있고 잎과 꽃이 달려 있다','잎과만 이어져 있다','씨와만 연결되어 있다','아무것과도 연결되어 있지 않다'],0,'줄기는 뿌리와 이어져 있고, 줄기에는 잎과 꽃이 달려 있어요.'),
+M('stem','줄기가 곧게 뻗어 자라는 것을 무엇이라 하는가?',['감는줄기','곧은줄기','기는줄기','덩이줄기'],1,'곧은줄기는 줄기가 곧게 뻗어 자라요. 소나무, 해바라기 등이 있어요.'),
+M('stem','다른 식물이나 물체를 감고 올라가는 줄기는?',['곧은줄기','감는줄기','기는줄기','덩이줄기'],1,'감는줄기는 줄기가 다른 식물이나 물체를 감고 올라가요. 호박, 나팔꽃 등이 있어요.'),
+M('stem','땅 위를 기는 듯이 자라는 줄기는?',['곧은줄기','감는줄기','기는줄기','덩이줄기'],2,'기는줄기는 줄기가 땅 위를 기는 듯이 자라요. 딸기, 고구마 등이 있어요.'),
+M('stem','줄기가 양분을 저장하여 굵게 자라는 것을 무엇이라 하는가?',['곧은줄기','감는줄기','기는줄기','덩이줄기'],3,'덩이줄기는 줄기가 양분을 저장하여 굵게 자라요. 감자, 생강 등이 있어요.'),
+M('stem','줄기가 하는 일로 옳지 않은 것은?',['물과 양분의 이동','식물 지지','양분 저장','꽃가루받이'],3,'꽃가루받이는 줄기가 아니라 꽃이 하는 일이에요.'),
+M('stem','줄기에서 물과 양분이 이동하는 통로에 대한 설명으로 옳은 것은?',['물이 이동하는 통로만 있다','물이 이동하는 통로와 양분이 이동하는 통로가 각각 있다','양분만 이동한다','통로가 없다'],1,'줄기에는 물이 이동하는 통로와 양분이 이동하는 통로가 있어요.'),
+M('stem','백합 줄기를 붉은 색소 물에 넣고 단면을 잘랐을 때 붉게 물든 부분이 뜻하는 것은?',['양분이 저장된 곳','물이 이동한 통로','세포벽','뿌리털'],1,'줄기 단면에서 붉게 물든 부분은 물이 이동한 통로예요.'),
+M('stem','선인장 줄기가 굵은 까닭은?',['양분을 저장해서','물을 저장해서','공기를 저장해서','씨를 저장해서'],1,'선인장은 줄기에 물을 저장하여 줄기가 굵어요.'),
+M('stem','탱자나무 줄기의 일부가 가시로 변한 까닭은?',['양분 저장','물 저장','동물로부터 보호','광합성'],2,'탱자나무는 줄기의 일부가 가시로 변해 동물로부터 식물체를 보호해요.'),
+M('stem','감자와 생강처럼 줄기가 양분을 저장하여 땅속에서 덩이 모양으로 굵어진 것은?',['뿌리','덩이줄기','잎맥','꽃받침'],1,'감자와 생강은 뿌리가 아니라 땅속으로 이어진 줄기(덩이줄기)에 양분을 저장해요.'),
+M('stem','줄기의 이동 기능에 대한 설명으로 옳은 것은?',['물과 양분은 줄기를 통해 식물의 각 기관으로 이동한다','물만 이동한다','양분만 이동한다','아무것도 이동하지 않는다'],0,'물과 양분은 줄기를 통해 식물의 각 기관으로 이동해요.'),
+S('stem','감자처럼 줄기가 양분을 저장하여 땅속에서 덩이 모양으로 굵어진 줄기를 무엇이라 하는지 쓰시오.','덩이줄기','덩이줄기는 줄기가 양분을 저장하여 덩이 모양으로 굵게 자란 것이에요.'),
+M('stem','줄기에 대한 설명으로 옳지 않은 것은?',['뿌리와 이어져 있다','잎과 꽃이 달려 있다','식물의 각 기관과 연결되어 있다','땅속으로만 자란다'],3,'줄기는 대부분 땅 위로 길게 자라요.'),
+M('stem','곧은줄기를 가진 식물이 아닌 것은?',['소나무','해바라기','호박','은행나무'],2,'호박은 감는줄기를 가진 식물이에요.'),
+M('stem','감는줄기를 가진 식물이 아닌 것은?',['호박','나팔꽃','소나무','등나무'],2,'소나무는 곧은줄기를 가진 식물이에요.'),
+M('stem','기는줄기를 가진 식물이 아닌 것은?',['딸기','고구마','감자','클로버'],2,'감자는 덩이줄기를 가진 식물이에요.'),
+M('stem','덩이줄기를 가진 식물이 아닌 것은?',['감자','생강','딸기','돼지감자'],2,'딸기는 기는줄기를 가진 식물이에요.'),
+M('stem','감자와 생강에 대한 설명으로 옳은 것은?',['뿌리에 양분을 저장한다','땅속으로 이어진 줄기 부분에 양분을 저장한다','열매에 양분을 저장한다','잎에 양분을 저장한다'],1,'감자나 생강은 뿌리가 아니라 땅속으로 이어진 줄기 부분에 양분을 저장해요.'),
+M('stem','줄기의 이동 기능에 대한 설명으로 옳지 않은 것은?',['물이 이동하는 통로가 있다','양분이 이동하는 통로가 있다','물과 양분이 서로 다른 통로로 이동한다','통로 없이 무작위로 이동한다'],3,'줄기에는 물이 이동하는 통로와 양분이 이동하는 통로가 각각 있어요.'),
+M('stem','줄기의 지지 기능이란?',['양분을 저장하는 것','잎과 꽃 등을 받쳐 식물이 설 수 있도록 하는 것','물을 흡수하는 것','씨를 만드는 것'],1,'줄기는 잎, 꽃 등을 받쳐 주고 식물이 설 수 있도록 지지해요.'),
+M('stem','백합 줄기로 물의 이동을 관찰하는 실험에서 사용하는 것은?',['파란 색소 물','붉은 색소 물','소금물','설탕물'],1,'백합 줄기를 붉은 색소 물에 넣어 물이 이동하는 통로를 관찰해요.'),
+M('stem','백합 줄기의 가로 단면에서 붉은색 점들이 퍼져 있는 것이 뜻하는 것은?',['양분이 저장된 곳','물이 이동한 통로','세포벽의 위치','뿌리가 자란 흔적'],1,'붉게 물든 부분은 물이 이동한 통로예요.'),
+M('stem','백합 줄기의 세로 단면에서 볼 수 있는 것은?',['붉은색 점','붉은색 선','초록색 무늬','아무 변화 없음'],1,'세로 단면에서는 물이 이동한 통로가 붉은색 선으로 보여요.'),
+M('stem','백합의 생김새로 옳은 것은?',['줄기가 곧게 뻗어 있다','줄기가 다른 식물을 감고 올라간다','줄기가 땅 위를 긴다','줄기가 덩이 모양이다'],0,'백합은 곧은줄기를 가지고 있어요.'),
+M('stem','백합 줄기를 붉은 색소 물에 하루 넣어 두면 잎과 꽃은 어떻게 변하는가?',['색이 변하지 않는다','붉은색으로 변한다','시든다','초록색이 더 진해진다'],1,'물이 이동하면서 잎과 꽃이 붉은색으로 변해요.'),
+M('stem','백합 대신 물이 이동하는 통로 관찰 실험에 이용할 수 있는 식물로 지학사 교과서에서 소개하는 것은?',['아스파라거스','봉선화','고추','나팔꽃'],0,'지학사 교과서에서는 백합 대신 아스파라거스를 이용해요.'),
+M('stem','봉선화 줄기에서 물이 이동하는 통로가 배열된 모양은?',['줄기 전체에 퍼져 있다','가장자리를 따라 고리 모양으로 배열되어 있다','통로가 없다','중심에만 있다'],1,'봉선화는 줄기의 가장자리를 따라 고리 모양으로 통로가 배열돼 있어요.'),
+M('stem','백합 줄기에서 물이 이동하는 통로가 배열된 모양은?',['줄기 전체에 퍼져 있다','가장자리를 따라 고리 모양으로만 있다','통로가 없다','중심에만 있다'],0,'백합은 줄기 전체에 물이 이동하는 통로가 퍼져 있어요.'),
+M('stem','줄기에서 물이 이동하는 모습을 보고 학생들이 오해하기 쉬운 것은?',['줄기가 광합성을 한다는 것','줄기가 직접 물을 흡수한다는 것','줄기에 꽃이 핀다는 것','줄기가 씨를 만든다는 것'],1,'실제로는 모세관 현상이나 증산 작용에 의한 장력 등으로 물이 물관을 따라 올라간 것이에요.'),
+S('stem','줄기 단면에서 색소 물이 붉게 물든 부분이 나타내는 것을 무엇이라 하는지 쓰시오.','물이 이동한 통로','줄기 단면에서 붉게 물든 부분은 물이 이동한 통로예요.'),
+S('stem','줄기가 다른 식물이나 물체를 감고 올라가는 형태의 줄기를 무엇이라 하는지 쓰시오.','감는줄기','감는줄기는 다른 식물이나 물체를 감고 올라가요.'),
+
+/* ===== 잎과 광합성 ===== */
+M('leaf','잎은 대부분 무엇으로 이루어져 있는가?',['뿌리와 줄기','잎몸과 잎자루','암술과 수술','씨와 열매'],1,'잎은 대부분 잎몸과 잎자루로 이루어져 있어요.'),
+M('leaf','잎몸에 퍼져 있는 것은?',['뿌리털','잎맥','기공','판막'],1,'잎맥은 잎몸에 퍼져 있어요.'),
+M('leaf','잎몸이 줄기에 붙어 있게 연결해 주는 부분은?',['잎맥','잎자루','뿌리','꽃받침'],1,'잎자루는 잎몸이 줄기에 붙어 있도록 연결해 줘요.'),
+M('leaf','잎이 대부분 납작한 모양인 까닭은?',['양분을 저장하기 위해','빛을 더 많이 받기 위해','물을 저장하기 위해','무게를 줄이기 위해'],1,'잎이 납작하면 양분을 만들 때 필요한 빛을 더 많이 받을 수 있어요.'),
+M('leaf','식물이 스스로 양분을 만드는 것을 무엇이라 하는가?',['증산 작용','광합성','꽃가루받이','호흡'],1,'광합성은 식물이 스스로 양분을 만드는 과정이에요.'),
+M('leaf','광합성이란 무엇인가?',['식물이 빛을 이용해 이산화 탄소와 물로 양분을 만드는 것','동물이 다른 생물을 먹는 것','뿌리가 물을 흡수하는 것','씨가 멀리 퍼지는 것'],0,'광합성은 식물이 빛을 이용하여 이산화 탄소, 물로 양분을 만드는 것이에요.'),
+M('leaf','광합성에 반드시 필요한 것으로 옳은 것은?',['빛','이산화 탄소','물','위 세 가지 모두'],3,'광합성에는 빛, 이산화 탄소, 물이 모두 필요해요.'),
+M('leaf','광합성이 주로 일어나는 장소는?',['뿌리','줄기','잎','꽃'],2,'광합성은 주로 잎에서 일어나요.'),
+M('leaf','광합성으로 만들어지는 양분은?',['단백질','지방','녹말','비타민'],2,'광합성으로 만들어지는 양분은 녹말이에요.'),
+M('leaf','잎에서 만든 양분(녹말)은 어떻게 되는가?',['그 자리에서 사라진다','다른 형태로 바뀌어 줄기를 통해 식물 전체로 이동한다','뿌리에서만 사용된다','꽃에서만 사용된다'],1,'녹말은 다른 형태로 바뀌어 줄기를 통해 식물 전체로 이동해요.'),
+M('leaf','동물이 양분을 얻는 방법과 식물이 양분을 얻는 방법의 차이로 옳은 것은?',['동물은 광합성을 하고 식물은 먹이를 먹는다','동물은 다른 생물을 먹고 식물은 광합성으로 스스로 만든다','둘 다 광합성을 한다','둘 다 다른 생물을 먹는다'],1,'동물은 다른 생물을 먹어서 양분을 얻지만, 식물은 광합성으로 스스로 양분을 만들어요.'),
+M('leaf','잎에서 만든 양분을 확인하는 실험에서 잎을 에탄올에 넣는 까닭은?',['양분을 더 만들기 위해','초록색 색소를 제거하기 위해','세포를 파괴하기 위해','물을 없애기 위해'],1,'에탄올에 넣으면 잎의 초록색 색소가 제거되어 색깔 변화를 잘 관찰할 수 있어요.'),
+M('leaf','아이오딘-아이오딘화 칼륨 용액이 녹말과 만나면 어떤 색으로 변하는가?',['붉은색','청람색','노란색','흰색'],1,'아이오딘-아이오딘화 칼륨 용액은 녹말과 반응하면 청람색으로 변해요.'),
+M('leaf','알루미늄 포일을 씌워 빛을 받지 못한 잎에 아이오딘-아이오딘화 칼륨 용액을 떨어뜨렸을 때의 결과는?',['청람색으로 변한다','색깔 변화가 없다','붉은색으로 변한다','검은색으로 변한다'],1,'빛을 받지 못한 잎은 녹말이 없어 색깔 변화가 없어요.'),
+M('leaf','빛을 받은 잎에 아이오딘-아이오딘화 칼륨 용액을 떨어뜨렸을 때의 결과는?',['색깔 변화가 없다','청람색으로 변한다','노란색으로 변한다','초록색 그대로다'],1,'빛을 받은 잎에는 녹말이 있어 청람색으로 변해요.'),
+M('leaf','이 실험을 통해 알 수 있는 사실은?',['빛을 받지 않아도 잎에서 녹말이 만들어진다','빛을 받은 잎에서만 녹말이 만들어진다','뿌리에서만 녹말이 만들어진다','녹말은 항상 일정하게 있다'],1,'빛을 받은 잎에서만 녹말(양분)이 만들어져요.'),
+M('leaf','선인장은 잎이 가시로 변하여 광합성이 주로 어디에서 일어나는가?',['뿌리','줄기','꽃','열매'],1,'선인장은 잎이 가시로 변해 대부분 줄기에서 광합성이 일어나요.'),
+M('leaf','광합성으로 만들어진 양분이 이동한 뒤 사용되는 곳으로 옳지 않은 것은?',['식물이 자라는 데 사용된다','일부는 저장된다','식물이 살아가는 데 사용된다','항상 모두 즉시 사라진다'],3,'양분은 식물이 살아가거나 자라는 데 사용되고 일부는 저장돼요.'),
+S('leaf','식물이 빛을 이용하여 이산화 탄소와 물로 스스로 양분을 만드는 과정을 무엇이라 하는지 쓰시오.','광합성','광합성은 식물이 빛을 이용해 스스로 양분을 만드는 과정이에요.'),
+S('leaf','잎에서 광합성으로 만들어져 뿌리, 줄기, 잎 등에 저장되는 양분을 무엇이라 하는지 쓰시오.','녹말','광합성으로 만들어지는 양분은 녹말이에요.'),
+M('leaf','잎에 대한 설명으로 옳지 않은 것은?',['대부분 초록색이다','대부분 잎몸과 잎자루로 이루어져 있다','잎몸에 잎맥이 퍼져 있다','모든 식물의 잎에는 잎자루가 있다'],3,'식물의 종류에 따라 잎자루가 없는 잎도 있어요.'),
+M('leaf','잎맥이 그물 모양으로 퍼진 잎도 있고 나란히 배열된 잎도 있다는 사실에서 알 수 있는 것은?',['식물의 종류에 따라 잎의 생김새가 다양하다','모든 식물의 잎맥은 같다','잎맥은 항상 그물 모양이다','잎맥은 뿌리에만 있다'],0,'식물의 종류에 따라 잎맥의 모양이 그물 모양이거나 나란한 모양으로 다양해요.'),
+M('leaf','광합성이 주로 잎에서 일어나지만, 초록색이면 광합성이 일어날 수도 있는 부분은?',['뿌리와 줄기','꽃과 열매','씨','뿌리털'],0,'초록색으로 보이는 줄기나 뿌리에서도 광합성이 일어날 수 있어요.'),
+M('leaf','잎에서 만드는 양분을 확인하는 실험에서 봉선화 잎 중 한 개에 알루미늄 포일을 씌우는 까닭은?',['양분을 더 만들게 하려고','빛을 받지 못하게 하여 빛을 받은 잎과 비교하려고','잎을 보호하려고','물을 막으려고'],1,'알루미늄 포일을 씌우면 빛을 받지 못해 빛을 받은 잎과 결과를 비교할 수 있어요.'),
+M('leaf','이 실험에서 에탄올이 든 작은 비커를 뜨거운 물이 든 큰 비커에 넣는 까닭은?',['에탄올을 데워 잎의 초록색 색소를 잘 빼내기 위해','잎을 삶기 위해','물을 없애기 위해','녹말을 만들기 위해'],0,'뜨거운 물로 에탄올을 데우면 잎의 초록색 색소가 잘 빠져나가요.'),
+M('leaf','아이스크림, 천재 교과서에서는 잎을 에탄올에 넣기 전에 어떻게 하는가?',['바로 아이오딘 용액을 떨어뜨린다','뜨거운 물이 든 비커에 1분간 담갔다가 에탄올에 넣는다','얼음물에 담근다','소금물에 씻는다'],1,'아이스크림, 천재 교과서에서는 잎을 뜨거운 물이 든 비커에 1분간 담갔다가 에탄올에 넣어요.'),
+M('leaf','실험에서 잎의 색깔이 연해지면 다음으로 하는 일은?',['바로 아이오딘 용액을 떨어뜨린다','따뜻한 물에 헹군 뒤 페트리 접시에 올려놓는다','다시 에탄올에 넣는다','햇빛에 말린다'],1,'색깔이 연해진 잎은 따뜻한 물에 헹군 다음 페트리 접시에 올려놓아요.'),
+M('leaf','잎에서 만드는 양분 확인 실험에 사용하는 식물로 미래엔 교과서에서 다루는 것은?',['봉선화','고추','제라늄','나팔꽃'],1,'미래엔 교과서에서는 고추를 사용해요.'),
+M('leaf','잎을 오전이 아닌 오후에 채집하여 실험하는 까닭은?',['오전에는 이슬이 있어서','식물이 밤에 양분을 다른 기관으로 이동시켜 오전에 딴 잎은 양분이 거의 없어서','오전에는 잎이 너무 뜨거워서','오후에만 광합성을 해서'],1,'식물은 밤에 양분을 다른 기관으로 이동시켜 저장하기 때문에 오전에 딴 잎은 양분이 거의 없어요.'),
+M('leaf','녹말이 많이 든 음식에 아이오딘-아이오딘화 칼륨 용액을 떨어뜨렸을 때의 결과로 옳은 것은?',['밥과 감자 모두 청람색으로 변한다','밥은 청람색, 감자는 변화 없음','둘 다 변화 없음','둘 다 붉은색으로 변한다'],0,'녹말이 많이 든 밥이나 감자에 용액을 떨어뜨리면 청람색으로 변해요.'),
+M('leaf','알루미늄 포일을 씌운 잎과 씌우지 않은 잎을 비교하는 실험에서 다르게 한 조건은?',['잎의 크기','빛을 받았는지 여부','물의 양','식물의 종류'],1,'이 실험에서 다르게 한 조건은 빛을 받았는지 여부예요.'),
+M('leaf','선인장이 잎 대신 가시를 가지고 있어도 광합성을 할 수 있는 까닭은?',['뿌리에서 광합성을 하기 때문에','초록색 줄기에서 광합성이 일어나기 때문에','광합성을 하지 않기 때문에','꽃에서 광합성을 하기 때문에'],1,'선인장은 초록색 줄기에서 대부분의 광합성이 일어나요.'),
+M('leaf','광합성으로 만들어진 양분의 이동에 대한 설명으로 옳은 것은?',['양분은 이동하지 않고 잎에만 머문다','양분은 줄기를 통해 식물의 각 기관으로 이동한다','양분은 뿌리에서만 사용된다','양분은 꽃에서만 만들어진다'],1,'잎에서 만들어진 양분은 줄기를 통해 식물의 각 기관으로 이동해요.'),
+S('leaf','잎에서 만든 양분을 확인하는 실험에서 녹말과 반응하여 청람색으로 변하는 용액의 이름을 쓰시오.','아이오딘-아이오딘화 칼륨 용액','이 용액은 녹말과 반응하면 청람색으로 변해요.'),
+
+/* ===== 증산 작용 ===== */
+M('transpire','잎의 표면에 있는 매우 작은 구멍을 무엇이라 하는가?',['기공','잎맥','뿌리털','판막'],0,'기공은 잎의 표면에 있는 매우 작은 구멍이에요.'),
+M('transpire','기공은 잎의 어느 면에 많이 있는가?',['앞면','뒷면','양쪽 모두 같다','잎맥에만'],1,'기공은 대부분 잎의 뒷면에 많아요.'),
+M('transpire','식물의 잎에서 물이 수증기 상태로 기공을 통해 식물 밖으로 빠져나가는 것을 무엇이라 하는가?',['광합성','증산 작용','꽃가루받이','호흡'],1,'증산 작용은 잎에서 물이 수증기 상태로 기공을 통해 빠져나가는 것이에요.'),
+M('transpire','증산 작용의 역할로 옳지 않은 것은?',['뿌리에서 흡수한 물이 꼭대기까지 올라가는 것을 돕는다','식물의 온도를 조절한다','씨를 멀리 퍼뜨린다','물을 식물 밖으로 내보낸다'],2,'씨를 퍼뜨리는 것은 열매의 역할이에요.'),
+M('transpire','증산 작용이 잘 일어나는 조건으로 옳지 않은 것은?',['햇빛이 강할 때','온도가 높을 때','습도가 높을 때','바람이 잘 불 때'],2,'습도가 낮을 때 증산 작용이 잘 일어나요.'),
+M('transpire','기공은 하루 중 언제 주로 열리는가?',['낮','밤','새벽에만','항상 닫혀 있다'],0,'기공은 증산 작용이 활발한 낮에 주로 열려요.'),
+M('transpire','밤이 되면 기공은 어떻게 되는가?',['더 크게 열린다','닫힌다','사라진다','색이 변한다'],1,'기공은 밤에는 닫혀요.'),
+M('transpire','잎을 그대로 둔 봉선화와 잎을 모두 떼어 낸 봉선화에 각각 비닐봉지를 씌웠을 때, 물방울이 맺히는 쪽은?',['잎을 그대로 둔 쪽','잎을 모두 떼어 낸 쪽','둘 다 맺힌다','둘 다 맺히지 않는다'],0,'잎이 있어야 증산 작용으로 물방울이 맺혀요.'),
+M('transpire','이 실험에서 다르게 한 조건은?',['물의 양','잎의 유무','비닐봉지의 크기','삼각 플라스크의 크기'],1,'이 실험에서 다르게 한 조건은 잎의 유무예요.'),
+M('transpire','푸른색 염화 코발트 종이가 물에 닿으면 어떤 색으로 변하는가?',['노란색','붉은색','검은색','흰색'],1,'푸른색 염화 코발트 종이는 물에 닿으면 붉은색으로 변해요.'),
+M('transpire','잎 뒷면에 붙인 푸른색 염화 코발트 종이의 색깔 변화로 옳은 것은?',['변화 없다','붉은색으로 변한다','초록색으로 변한다','검은색으로 변한다'],1,'잎 뒷면에서 물이 빠져나와 염화 코발트 종이가 붉은색으로 변해요.'),
+M('transpire','이 실험으로 알 수 있는 사실은?',['잎 앞면에서만 물이 빠져나간다','잎 뒷면에서 물이 빠져나간다','잎에서는 물이 나가지 않는다','뿌리에서 물이 빠져나간다'],1,'식물의 잎 뒷면에서 물이 빠져나가요.'),
+M('transpire','선인장의 잎이 가시 모양이어서 사막에 살기 유리한 까닭은?',['기공이 많아 물을 많이 흡수해서','기공이 적어 증산 작용이 적어 물 손실을 줄여서','광합성을 더 많이 해서','뿌리가 깊어서'],1,'잎이 가시 모양이면 기공이 별로 없어 증산 작용이 잘 일어나지 않아 물이 빠져나가는 것을 줄일 수 있어요.'),
+M('transpire','건조한 실내에서 식물을 많이 키우면 습도가 높아지는 까닭은?',['식물이 물을 만들어서','증산 작용으로 물이 빠르게 증발하기 때문','뿌리가 물을 뿜어내서','꽃에서 수증기가 나와서'],1,'건조한 실내에서는 물이 빠르게 증발해 증산 작용이 활발하게 일어나기 때문이에요.'),
+M('transpire','빨래가 잘 마르는 조건과 증산 작용이 잘 일어나는 조건의 공통점으로 옳지 않은 것은?',['햇빛이 강할 때','바람이 잘 불 때','습도가 낮을 때','온도가 낮을 때'],3,'온도가 높을 때 증산 작용과 빨래 건조가 잘 일어나요.'),
+S('transpire','잎에서 물이 수증기 상태로 기공을 통해 식물 밖으로 빠져나가는 것을 무엇이라 하는지 쓰시오.','증산 작용','증산 작용은 잎에서 물이 수증기 상태로 기공을 통해 빠져나가는 것이에요.'),
+M('transpire','기공이 잎의 표면 외에 있을 수 있는 곳은?',['뿌리','어린 줄기나 꽃잎의 표면','씨','열매 속'],1,'기공은 어린 줄기나 꽃잎의 표면에도 있어요.'),
+M('transpire','증산 작용이 일어나는 원리로 옳은 것은?',['물이 액체 상태로 기공을 통해 나간다','물이 수증기 상태로 기공을 통해 나간다','이산화 탄소가 기공을 통해 나간다','산소가 뿌리로 들어간다'],1,'증산 작용은 물이 수증기 상태로 기공을 통해 나가는 것이에요.'),
+M('transpire','증산 작용으로 식물의 온도가 조절되는 원리는?',['물이 증발하며 주변의 열을 흡수해서','물이 얼면서 열을 방출해서','빛을 반사해서','뿌리가 차가워서'],0,'물이 증발할 때 주변의 열을 흡수하여 식물의 온도를 내려 줘요.'),
+M('transpire','비닐봉지를 이용한 증산 작용 확인 실험에서 같게 한 조건이 아닌 것은?',['식물의 종류','잎의 유무','물의 양','비닐봉지의 크기'],1,'잎의 유무는 다르게 한 조건이고 나머지는 같게 한 조건이에요.'),
+M('transpire','이 실험에서 두 봉선화 모종을 탈지면으로 감싸 고정하는 까닭은?',['물이 새지 않고 모종이 흔들리지 않게 하기 위해','잎을 보호하기 위해','뿌리를 잘라내기 위해','빛을 막기 위해'],0,'탈지면으로 감싸면 물이 새지 않고 모종을 고정할 수 있어요.'),
+M('transpire','이 실험에서 두 봉선화에 비닐봉지를 씌우고 햇빛이 잘 드는 곳에 놓아두는 시간으로 옳은 것은?',['10분','1시간','3~4시간','하루 종일'],2,'비닐봉지를 씌운 뒤 3~4시간 동안 놓아두고 변화를 관찰해요.'),
+M('transpire','염화 코발트 종이를 이용한 실험에서 하나는 페트리 접시에 붙이는 까닭은?',['비교(대조)하기 위해','색을 내기 위해','빛을 막기 위해','물을 만들기 위해'],0,'페트리 접시에 붙인 것과 잎에 붙인 것을 비교하기 위해서예요.'),
+M('transpire','염화 코발트 종이 실험에서 10분 뒤 관찰하는 것은?',['잎의 크기 변화','염화 코발트 종이의 색깔 변화','뿌리의 길이','꽃의 개수'],1,'10분 뒤 염화 코발트 종이의 색깔 변화를 관찰해요.'),
+M('transpire','페트리 접시에 붙인 염화 코발트 종이의 색깔 변화로 옳은 것은?',['붉은색으로 변한다','색깔 변화가 없다','파란색이 더 진해진다','검은색으로 변한다'],1,'페트리 접시에 붙인 종이는 물에 닿지 않으므로 색깔 변화가 없어요.'),
+M('transpire','증산 작용을 확인하는 두 실험(비닐봉지, 염화 코발트 종이)이 공통으로 보여 주는 사실은?',['잎에서 물이 빠져나간다','뿌리에서 물을 흡수한다','줄기에서 양분이 이동한다','꽃에서 씨가 만들어진다'],0,'두 실험 모두 식물의 잎에서 물이 빠져나간다는 것을 보여 줘요.'),
+M('transpire','잎의 증산 작용을 확인하는 실험을 설계할 때 가장 중요한 것은?',['잎의 유무만 다르게 하고 나머지 조건은 모두 같게 한다','모든 조건을 다르게 한다','온도만 다르게 한다','식물 종류만 다르게 한다'],0,'잎의 유무만 다르게 해야 증산 작용이 잎에서 일어난 것임을 확인할 수 있어요.'),
+M('transpire','증산 작용이 잘 일어나지 않는 조건으로 옳은 것은?',['햇빛이 강할 때','습도가 높을 때','온도가 높을 때','바람이 잘 불 때'],1,'습도가 높을 때는 증산 작용이 잘 일어나지 않아요.'),
+M('transpire','식물의 꼭대기까지 물이 올라가는 데 도움을 주는 작용은?',['광합성','증산 작용','꽃가루받이','호흡'],1,'증산 작용은 뿌리에서 흡수한 물이 꼭대기까지 올라가는 것을 도와요.'),
+M('transpire','다음 중 증산 작용의 역할이 아닌 것은?',['물이 꼭대기까지 올라가는 것을 돕는다','식물의 온도를 조절한다','씨를 만든다','물을 식물 밖으로 내보낸다'],2,'씨를 만드는 것은 꽃(꽃가루받이)의 역할이에요.'),
+M('transpire','기공을 관찰하려면 어떤 도구가 필요한가?',['자','현미경','온도계','저울'],1,'기공은 크기가 매우 작아서 현미경으로 관찰해야 보여요.'),
+M('transpire','실내에 화분을 많이 두면 습도가 높아지는 것과 관련 있는 작용은?',['광합성','증산 작용','꽃가루받이','호흡'],1,'식물의 증산 작용으로 물이 수증기가 되어 나오면서 실내 습도가 높아져요.'),
+S('transpire','증산 작용을 확인하는 실험에서 잎이 있는 봉선화 쪽 비닐봉지 안에 맺히는 것은 무엇인지 쓰시오.','물방울','잎에서 증산 작용으로 나온 물이 비닐봉지 안에 물방울로 맺혀요.'),
+
+/* ===== 꽃 ===== */
+M('flower','꽃은 대부분 무엇으로 이루어져 있는가?',['뿌리','줄기와 잎','씨와 열매','암술, 수술, 꽃잎, 꽃받침'],3,'꽃은 대부분 암술, 수술, 꽃잎, 꽃받침으로 이루어져 있어요.'),
+M('flower','꽃가루를 만드는 부분은?',['암술','수술','꽃잎','꽃받침'],1,'수술은 꽃가루를 만들어요.'),
+M('flower','꽃가루가 옮겨 붙으면 아랫부분에서 씨를 만드는 부분은?',['암술','수술','꽃잎','꽃받침'],0,'암술은 꽃가루가 옮겨 붙으면 아랫부분에서 씨를 만들어요.'),
+M('flower','꽃잎을 받치고 보호하는 부분은?',['암술','수술','꽃잎','꽃받침'],3,'꽃받침은 꽃잎을 받치고 보호해요.'),
+M('flower','암술과 수술을 보호하고 곤충이나 새를 유인하기도 하는 부분은?',['암술','수술','꽃잎','꽃받침'],2,'꽃잎은 암술과 수술을 보호하고 곤충이나 새를 유인하기도 해요.'),
+M('flower','암술, 수술, 꽃잎, 꽃받침 중 일부가 없는 꽃으로 옳은 것은?',['사과꽃','복숭아꽃','호박꽃','봉선화꽃'],2,'호박꽃은 암꽃에 수술이 없고 수꽃에 암술이 없어요.'),
+M('flower','호박꽃의 암꽃에 없는 것은?',['암술','수술','꽃잎','꽃받침'],1,'호박꽃의 암꽃은 수술이 없어요.'),
+M('flower','호박꽃의 수꽃에 없는 것은?',['암술','수술','꽃잎','꽃받침'],0,'호박꽃의 수꽃은 암술이 없어요.'),
+M('flower','꽃이 하는 가장 중요한 일은?',['양분 저장','꽃가루받이를 통해 씨를 만드는 일','물 흡수','광합성'],1,'꽃은 꽃가루받이를 통해 씨를 만드는 일을 해요.'),
+M('flower','꽃가루받이(수분)란 무엇인가?',['씨가 열매로 자라는 것','수술에서 만든 꽃가루가 암술에 옮겨 붙는 것','뿌리가 물을 흡수하는 것','잎에서 양분을 만드는 것'],1,'꽃가루받이는 수술에서 만든 꽃가루가 암술에 옮겨 붙는 것이에요.'),
+M('flower','꽃가루받이는 무엇의 도움으로 이루어지는가?',['곤충만','새만','바람만','곤충, 새, 바람, 물 등 다양한 방법'],3,'꽃가루받이는 곤충, 새, 바람, 물 등 다양한 방법으로 이루어져요.'),
+M('flower','곤충에 의한 꽃가루받이를 하는 꽃의 예로 옳은 것은?',['소나무','개망초','벼','옥수수'],1,'개망초는 곤충에 의해 꽃가루받이가 이루어져요.'),
+M('flower','새에 의한 꽃가루받이를 하는 식물의 예로 옳은 것은?',['동백나무','소나무','벼','밀'],0,'동백나무는 새에 의해 꽃가루받이가 이루어져요.'),
+M('flower','바람에 의한 꽃가루받이를 하는 식물의 예로 옳은 것은?',['개망초','동백나무','소나무','무궁화'],2,'소나무는 바람에 의해 꽃가루받이가 이루어져요.'),
+M('flower','바람에 의해 꽃가루받이를 하는 꽃의 특징으로 옳은 것은?',['꽃잎이 화려하고 크다','꽃잎이 없거나 작아 눈에 잘 띄지 않는다','향기가 매우 강하다','곤충을 유인하기 위해 꿀이 많다'],1,'바람에 의해 꽃가루받이를 하는 꽃은 꽃잎이 없거나 작아 곤충이나 새를 유인하지 못해요.'),
+M('flower','곤충이나 새의 도움으로 꽃가루받이가 이루어지는 꽃의 꽃잎이 화려하면 유리한 까닭은?',['양분을 더 많이 저장해서','곤충이나 새를 유인하는 데 유리해서','물을 더 많이 흡수해서','씨를 더 많이 만들어서'],1,'꽃잎이 화려하면 곤충이나 새를 유인하여 꽃가루받이를 하는 데 유리해요.'),
+M('flower','꽃가루받이가 이루어지면 만들어지는 것은?',['뿌리','씨','잎','줄기'],1,'꽃가루받이가 이루어지면 씨가 만들어져요.'),
+M('flower','씨를 둘러싼 부분이 씨와 함께 자라서 되는 것은?',['뿌리','줄기','열매','꽃잎'],2,'씨를 둘러싼 부분이 씨와 함께 자라서 열매가 돼요.'),
+M('flower','열매가 하는 일로 옳은 것은?',['양분을 만든다','씨를 보호하고 씨가 익으면 멀리 퍼지게 한다','물을 흡수한다','광합성을 한다'],1,'열매는 씨를 보호하고, 씨가 익으면 멀리 퍼지게 해요.'),
+S('flower','수술에서 만든 꽃가루가 암술에 옮겨 붙는 것을 무엇이라 하는지 쓰시오.','꽃가루받이','수술에서 만든 꽃가루가 암술에 옮겨 붙는 것을 꽃가루받이(수분)라고 해요.'),
+M('flower','꽃받침이 없는 꽃으로 옳은 것은?',['복숭아꽃','튤립','사과꽃','봉선화꽃'],1,'튤립은 꽃받침이 없어요.'),
+M('flower','꽃잎과 꽃받침이 모두 없는 꽃으로 옳은 것은?',['벼꽃','복숭아꽃','튤립','사과꽃'],0,'벼꽃은 꽃잎과 꽃받침이 없어요.'),
+M('flower','열매로 자라는 부분은 무엇이 함께 자란 것인가?',['씨를 싸고 있는 씨방이나 꽃받침 등','뿌리','잎맥','줄기의 마디'],0,'씨를 싸고 있는 씨방이나 꽃받침 등이 함께 자라서 열매가 돼요.'),
+M('flower','가지꽃의 꽃잎 색깔로 옳은 것은?',['흰색','연보라색','노란색','붉은색'],1,'가지꽃의 꽃잎은 연보라색이며 통으로 붙어 있어요.'),
+M('flower','고추꽃의 꽃받침 모양으로 옳은 것은?',['넓은 종 모양','좁고 긴 모양','별 모양','원기둥 모양'],0,'고추꽃은 넓은 종 모양의 꽃받침이 있어요.'),
+M('flower','괭이밥꽃의 꽃잎에 대한 설명으로 옳은 것은?',['흰색이며 통으로 붙어 있다','노란색이고 5갈래로 갈라져 있다','보라색이며 갈라지지 않는다','꽃잎이 없다'],1,'괭이밥꽃의 꽃잎은 노란색이고 5갈래로 갈라져 있어요.'),
+M('flower','가지꽃, 고추꽃, 괭이밥꽃의 공통점으로 옳은 것은?',['모두 암술을 여러 개의 수술이 둘러싸고 있다','모두 꽃잎이 노란색이다','모두 꽃받침이 없다','모두 바람에 의해 꽃가루받이를 한다'],0,'세 꽃 모두 암술을 여러 개의 수술이 둘러싸고 있어요.'),
+M('flower','달맞이꽃의 수술 개수로 옳은 것은?',['1개','4개','8개','16개'],2,'달맞이꽃의 수술은 8개이고 노란색이에요.'),
+M('flower','달맞이꽃 암술의 생김새로 옳은 것은?',['윗부분이 4갈래로 갈라져 있다','갈라지지 않고 매끈하다','3갈래로 갈라져 있다','나선 모양이다'],0,'달맞이꽃의 암술은 1개이고 윗부분이 4갈래로 갈라져 있어요.'),
+M('flower','달맞이꽃의 꽃잎에 대한 설명으로 옳은 것은?',['4장이고 노란색이며 각각 떨어져 있다','5장이고 흰색이며 통으로 붙어 있다','꽃잎이 없다','2장이고 보라색이다'],0,'달맞이꽃의 꽃잎은 4장이고 노란색이며 각각 떨어져 있어요.'),
+M('flower','사과나무꽃이 열매가 되는 과정에서 가장 먼저 일어나는 일은?',['씨를 둘러싼 부분이 자란다','꽃이 핀다','암술의 아랫부분에서 씨를 만든다','꽃가루가 암술에 옮겨 붙는다'],1,'가장 먼저 꽃이 피어야 그 다음 과정이 이어져요.'),
+M('flower','사과나무꽃이 열매가 되는 과정에서 곤충의 몸에 붙은 꽃가루가 암술에 옮겨 붙은 다음 일어나는 일은?',['꽃이 진다','암술의 아랫부분에서 씨를 만든다','뿌리가 자란다','잎이 떨어진다'],1,'꽃가루가 암술에 옮겨 붙으면 암술의 아랫부분에서 씨를 만들어요.'),
+M('flower','꽃이 열매가 되는 과정의 마지막 단계로 옳은 것은?',['꽃이 핀다','꽃가루받이가 이루어진다','씨가 만들어진다','씨를 둘러싼 부분이 씨와 함께 자라 열매가 된다'],3,'씨를 둘러싼 부분이 씨와 함께 자라 열매가 되는 것이 마지막 단계예요.'),
+S('flower','꽃가루받이가 이루어진 뒤 씨를 둘러싼 부분이 씨와 함께 자라서 만들어지는 것을 무엇이라 하는지 쓰시오.','열매','씨를 둘러싼 부분이 씨와 함께 자라면 열매가 돼요.'),
+];
+QUESTIONS.forEach((q,i)=>{q.id='q'+i;});
+
+/* ============ STATE / STORAGE ============ */
+const APP_KEY='plant6_100'; // 이 앱 전용 키 (다른 퀴즈 앱과 데이터가 섞이지 않도록)
+const TEACHER_PW='0000';
+let state={};
+function newSession(){
+  return {name:'',cats:[],order:'seq',mode:'full',wrongScope:'all',started:false,list:[],idx:0,correct:0,
+    wrong:[],answers:{},startTime:null,timeLeft:60,timerId:null,missionTimeLeft:300,missionTimerId:null,
+    setSize:20,setIdx:0,combo:0,maxCombo:0,answeredAny:false,giveUp:false,lockUntil:0,lockTimerId:null,selected:null,submitted:false};
+}
+state=newSession();
+
+function uid(){return 'u_'+Math.random().toString(36).slice(2,10);}
+function safeName(n){return (n||'').trim().replace(/[\s\/\\'"]+/g,'');}
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+/* 중요: 저장을 불러오는 데 실패했을 때 이를 "빈 데이터"와 구분하지 못하면,
+   실패를 빈 값으로 착각해 학생의 기존 오답·포인트 기록을 빈 값으로 덮어써서
+   지워버리는 심각한 문제가 생겨요. 그래서 모든 읽기/쓰기는 성공 여부(failed/ok)를
+   명시적으로 함께 돌려주고, 호출하는 쪽에서 실패 시 절대 덮어쓰지 않도록 해요.
+   또한 이 호출은 자주 일어나지 않으므로 속도보다 안정성을 우선해 재시도를 넉넉히 해요. */
+/* 중요: 저장 API는 '한 번도 저장된 적 없는 키'를 읽으려 하면 값이 아니라 예외(에러)를 던져요.
+   즉, 새 학생의 첫 시험이나 이 앱의 첫 시험 기록처럼 지극히 정상적인 상황에서도 매번 예외가
+   발생해요. 예전 코드는 이 '당연한 예외'를 '진짜 저장 실패'와 똑같이 취급해서 5번씩 쓸데없이
+   재시도하며 몇 초를 허비하고, 결국 실패로 판정해 저장 자체를 막아버렸어요(채점이 느려지고
+   오답이 저장되지 않은 근본 원인). 그래서 읽기(get)는 몇 번만 가볍게 재시도하고, 그래도 안 되면
+   '아직 데이터가 없다'로 간주해 항상 사용 가능한 값을 즉시 돌려줘요. 실제로 저장이 잘 됐는지는
+   쓰기(set)의 반환값으로만 판단해요(set은 실패 시 예외 대신 falsy 값을 돌려주도록 문서화돼 있어요). */
+async function sget(key,retries=2){
+  for(let i=0;i<=retries;i++){
+    try{
+      if(!window.storage || typeof window.storage.get!=='function') throw new Error('storage not ready');
+      const r=await window.storage.get(key,true);
+      return {value:r?JSON.parse(r.value):null, failed:false};
+    }catch(e){
+      if(i===retries) return {value:null, failed:false}; // 키가 없거나 일시적 오류 → 빈 값으로 간주하고 진행
+      await wait(250*(i+1));
+    }
+  }
+}
+async function sset(key,val,retries=4){
+  for(let i=0;i<=retries;i++){
+    try{
+      if(!window.storage || typeof window.storage.set!=='function') throw new Error('storage not ready');
+      const r=await window.storage.set(key,JSON.stringify(val),true);
+      if(r) return {ok:true};
+      if(i===retries) return {ok:false};
+    }catch(e){
+      if(i===retries) return {ok:false};
+    }
+    await wait(350*(i+1));
+  }
+  return {ok:false};
+}
+/* 학생별/전체 데이터를 각각 하나의 키로 묶어 저장 왕복 횟수를 최소화.
+   반환값은 {data, failed} 형태예요. failed가 true이면 data는 신뢰할 수 없는
+   기본값이므로, 호출하는 쪽에서 이 값으로 저장(덮어쓰기)하면 안 돼요. */
+async function getStudentData(name){
+  const {value:d, failed}=await sget('student_'+APP_KEY+'_'+safeName(name));
+  const data=d||{profile:{points:0,level:1,coupons:0},wrong:[],examLogs:[]};
+  if(!data.examLogs) data.examLogs=[];
+  if(!data.wrong) data.wrong=[];
+  if(!data.profile) data.profile={points:0,level:1,coupons:0};
+  return {data, failed};
+}
+const MAX_EXAM_LOGS=40; // 학생별 시험 기록(오답노트)은 최근 40회까지 보관해요.
+async function setStudentData(name,data){
+  const r=await sset('student_'+APP_KEY+'_'+safeName(name),data);
+  return r.ok;
+}
+async function getExamData(){
+  const {value:d, failed}=await sget('examdata_'+APP_KEY);
+  return {data: d||{results:[],hof:[]}, failed};
+}
+async function setExamData(data){
+  const r=await sset('examdata_'+APP_KEY,data);
+  return r.ok;
+}
+
+/* ============ HELPERS ============ */
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function pickByCats(cats){
+  if(!cats||cats.length===0) return QUESTIONS.slice();
+  return QUESTIONS.filter(q=>cats.includes(q.c));
+}
+function catName(id){const c=CATS.find(x=>x.id===id);return c?c.name:id;}
+function questionById(id){return QUESTIONS.find(q=>q.id===id);}
+/* 저장에는 {id, your}만 있으므로, 화면에 보여줄 때 QUESTIONS에서 문제/정답/해설을 다시 찾아 채워요. */
+function wrongDisplayInfo(w){
+  const q=questionById(w.id);
+  if(!q) return {q:'(삭제되었거나 찾을 수 없는 문제예요)',your:w.your||'-',correct:'-',explain:'',cat:''};
+  return {q:q.q, your:(w.your===null||w.your===undefined||w.your==='')?'(제출 안함)':w.your,
+    correct:q.t==='mcq'?q.o[q.a]:q.a, explain:q.e, cat:q.c};
+}
+function fmtDate(ts){const d=new Date(ts);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function fmtDT(ts){const d=new Date(ts);return fmtDate(ts)+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+function monthKey(ts){const d=new Date(ts);return d.getFullYear()+'년 '+(d.getMonth()+1)+'월';}
+
+/* ============ MODAL (alert/confirm이 샌드박스에서 막혀 있어 대체) ============ */
+function showAlert(msg){
+  return new Promise(resolve=>{
+    const ov=document.getElementById('modalOverlay');
+    document.getElementById('modalMsg').textContent=msg;
+    document.getElementById('modalBtns').innerHTML=`<button class="btn btn-primary" id="modalOkBtn">확인</button>`;
+    ov.classList.remove('hidden');
+    document.getElementById('modalOkBtn').onclick=()=>{ov.classList.add('hidden');resolve(true);};
+  });
+}
+function showConfirm(msg){
+  return new Promise(resolve=>{
+    const ov=document.getElementById('modalOverlay');
+    document.getElementById('modalMsg').textContent=msg;
+    document.getElementById('modalBtns').innerHTML=`<button class="btn btn-ghost" id="modalCancelBtn">취소</button><button class="btn btn-primary" id="modalOkBtn">확인</button>`;
+    ov.classList.remove('hidden');
+    document.getElementById('modalOkBtn').onclick=()=>{ov.classList.add('hidden');resolve(true);};
+    document.getElementById('modalCancelBtn').onclick=()=>{ov.classList.add('hidden');resolve(false);};
+  });
+}
+
+/* ============ RENDER ROOT ============ */
+let screen='setup';
+function render(){
+  const app=document.getElementById('app');
+  if(screen==='setup') app.innerHTML=renderSetup();
+  else if(screen==='quiz') app.innerHTML=renderQuiz();
+  else if(screen==='setresult') app.innerHTML=renderSetResult();
+  else if(screen==='result') app.innerHTML=renderResult();
+  else if(screen==='wrongnote') app.innerHTML=renderWrongNote();
+  else if(screen==='tlogin') app.innerHTML=renderTeacherLogin();
+  else if(screen==='tdash') app.innerHTML=`<div class="card"><p>불러오는 중...</p></div>`;
+  bindEvents();
+}
+
+/* ============ SETUP SCREEN ============ */
+function renderSetup(){
+  return `
+  <div class="hero">
+    <div class="eyebrow">초6 과학 · 3단원 식물의 구조와 기능</div>
+    <h1>식물 탐험대</h1>
+    <p>세포부터 꽃까지, 식물의 구조와 기능 ${QUESTIONS.length}제로 완전정복!</p>
+  </div>
+  <div class="card">
+    <label class="field-label">이름을 알려줄래?</label>
+    <input type="text" id="nameInput" placeholder="이름을 입력하세요" value="${state.name}">
+
+    <label class="field-label">범위를 골라볼까? <span style="font-weight:400;color:var(--sub);font-size:12px;">(아무것도 안 고르면 전체!)</span></label>
+    <div class="chip-grid">
+      ${CATS.map(c=>{
+        const cnt=QUESTIONS.filter(q=>q.c===c.id).length;
+        const active=state.cats.includes(c.id)?'active':'';
+        return `<div class="chip ${active}" data-cat="${c.id}"><b>${c.icon} ${c.name}</b><small>${cnt}문제</small></div>`;
+      }).join('')}
+    </div>
+
+    <div class="toggle-row">
+      <input type="checkbox" id="shuffleChk" ${state.order==='shuffle'?'checked':''}>
+      <label for="shuffleChk">문제 순서 섞기</label>
+    </div>
+
+    <label class="field-label">학습 모드를 골라볼까?</label>
+    <div class="mode-card ${state.mode==='full'?'active':''}" data-mode="full">
+      <div class="mt">📖 전체문제 모드</div><div class="md">고른 범위를 처음부터 끝까지 쭉 이어서 풀어요</div>
+    </div>
+    <div class="mode-card ${state.mode==='focus'?'active':''}" data-mode="focus">
+      <div class="mt">🎯 집중력 향상 모드</div><div class="md">20문제씩 세트로 나눠서 풀어요 (세트마다 쉬어가요)</div>
+    </div>
+    <div class="mode-card ${state.mode==='deep'?'active':''}" data-mode="deep">
+      <div class="mt">🔍 꼼꼼 정독 모드</div><div class="md">문제가 나오면 5초 동안은 보기를 누를 수 없어요</div>
+    </div>
+    <div class="mode-card ${state.mode==='wrong'?'active':''}" data-mode="wrong">
+      <div class="mt">📝 오답 모드</div><div class="md">틀렸던 문제만 섞어서 다시 풀며 확실히 외워요</div>
+      ${state.mode==='wrong'?`
+      <div class="scope-row" id="scopeRow">
+        <div class="scope-chip ${state.wrongScope==='recent'?'active':''}" data-scope="recent">🕐 최근 시험 오답만</div>
+        <div class="scope-chip ${state.wrongScope==='all'?'active':''}" data-scope="all">📚 여태까지 누적 오답 전체</div>
+      </div>`:''}
+    </div>
+    <div class="small-note">⏱️ 문제당 제한시간 60초가 함께 적용돼요 (5분 미션 제외)</div>
+
+    <div class="mission" id="missionBtn">⏱️ 5분 미션 (바로 8문제 도전!)</div>
+
+    <button class="btn btn-primary" id="startBtn" style="margin-top:6px;">시작하기</button>
+    <div class="row2">
+      <button class="btn btn-ghost" id="couponBtn">🍦 내 쿠폰함</button>
+      <button class="btn btn-ghost" id="hofBtn">🏆 명예의 전당</button>
+    </div>
+    <button class="btn btn-outline" id="wrongHistoryBtn" style="margin-top:10px;">📚 내 오답노트 모아보기 (PDF·인쇄)</button>
+    <button class="btn btn-outline" id="teacherBtn" style="margin-top:10px;">📋 강사용 결과 보기</button>
+    <div class="giveup" id="resetMyDataBtn" style="margin-top:14px;">🧹 내 오답노트·포인트 초기화</div>
+    <div class="giveup" id="storageTestBtn" style="margin-top:6px;">🔧 저장 기능 테스트 (오답모드가 안 될 때 눌러보세요)</div>
+  </div>
+  <div class="footer-copy">© 식물 탐험대 · 초6 과학 식물의 구조와 기능 ${QUESTIONS.length}제 · build 2026-08-10-v1</div>
+  `;
+}
+
+function startQuiz(mode){
+  const nameEl=document.getElementById('nameInput');
+  state.name=(nameEl?nameEl.value:state.name).trim();
+  if(!state.name){showAlert('이름을 입력해 주세요!');return;}
+  if(!safeName(state.name)){showAlert('이름에 특수문자나 공백만 있으면 기록이 저장되지 않아요. 다른 이름으로 입력해 주세요!');return;}
+  state.mode=mode||state.mode;
+  const pool=pickByCats(state.cats);
+  let list;
+  if(state.mode==='wrong'){
+    loadWrongPoolAndStart();
+    return;
+  } else if(state.mode==='mission'){
+    list=shuffle(pool).slice(0,8);
+  } else {
+    list=state.order==='shuffle'?shuffle(pool):pool.slice();
+  }
+  beginList(list);
+}
+
+/* 오답 모드: 이 학생의 실제 오답 기록만 정확히 불러와서 사용 (중복 채우기 없음 → 엉뚱한 문제가 섞이지 않음)
+   - '최근 시험 오답만': 가장 최근에 제출한 시험(examLogs의 마지막 기록)에서 틀린 문제만
+   - '전체 누적 오답': 지금까지 본 모든 시험 기록(examLogs)과 현재 미해결 오답(sd.wrong)을 합쳐서
+     한 번이라도 틀렸던(그리고 아직 확실히 정리 안 된) 문제를 모두 포함 → 로그인/기기를 바꿔도,
+     시간이 지나도 항상 똑같이 반영돼요. */
+async function loadWrongPoolAndStart(){
+  const {data:sd, failed}=await getStudentData(state.name);
+  if(failed){
+    await showAlert('오답 기록을 불러오지 못했어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.');
+    return;
+  }
+  let wn=[];
+  if(state.wrongScope==='recent'){
+    const logs=sd.examLogs||[];
+    if(logs.length===0){showAlert('아직 제출한 시험 기록이 없어요! 먼저 다른 모드로 시험을 한 번 봐 주세요.');return;}
+    const last=logs[logs.length-1];
+    wn=last.wrongList||[];
+    if(wn.length===0){showAlert('가장 최근 시험에서는 틀린 문제가 없었어요! 완벽했네요 🎉');return;}
+  } else {
+    // sd.wrong(현재 미해결 오답) + 모든 시험 기록의 오답을 합쳐 한 번이라도 틀렸던 문제를 폭넓게 포함
+    const fromLogs=[];
+    (sd.examLogs||[]).forEach(l=>{(l.wrongList||[]).forEach(w=>fromLogs.push(w));});
+    wn=[...(sd.wrong||[]), ...fromLogs];
+    if(wn.length===0){
+      if((sd.examLogs||[]).length===0){
+        showAlert('아직 본 시험이 없어요! 먼저 다른 모드로 시험을 한 번 봐 주세요.');
+      } else {
+        showAlert('지금까지 틀렸던 문제를 모두 맞혔어요! 완벽해요 🎉');
+      }
+      return;
+    }
+  }
+  const ids=[...new Set(wn.map(w=>w.id))];
+  let list=QUESTIONS.filter(q=>ids.includes(q.id));
+  list=shuffle(list);
+  beginList(list);
+}
+
+function beginList(list){
+  state.list=list;
+  state.idx=0;state.correct=0;state.wrong=[];state.answers={};
+  state.startTime=Date.now();state.combo=0;state.maxCombo=0;state.setIdx=0;
+  state.selected=null;state.submitted=false;state.giveUp=false;
+  screen='quiz';
+  render();
+  startTimerForCurrent();
+}
+
+/* ============ QUIZ SCREEN ============ */
+function currentQ(){return state.list[state.idx];}
+
+function renderQuiz(){
+  const q=currentQ();
+  if(!q) return renderResult();
+  const total=state.list.length;
+  const isMission=state.mode==='mission';
+  const timeDisplay=isMission?state.missionTimeLeft:state.timeLeft;
+  const timePct=isMission?Math.max(0,state.missionTimeLeft/300*100):Math.max(0,state.timeLeft/60*100);
+  const submittedInfo=state.submitted?state.lastResult:null;
+  const isLocked=state.mode==='deep' && !state.submitted && Date.now()<state.lockUntil;
+  let choicesHtml='';
+  if(q.t==='mcq'){
+    choicesHtml=q.o.map((opt,i)=>{
+      let cls='choice';
+      if(state.submitted){
+        if(i===q.a) cls+=' correct';
+        else if(i===state.selected) cls+=' wrong';
+      } else if(isLocked){
+        cls+=' locked';
+      } else if(state.selected===i){
+        cls+=' sel';
+      }
+      return `<div class="${cls}" data-idx="${i}">${['①','②','③','④'][i]} ${opt}</div>`;
+    }).join('');
+  } else {
+    choicesHtml=`<input type="text" class="kbdinput ${isLocked?'locked':''}" id="shortInput" placeholder="정답을 입력하세요" ${state.submitted||isLocked?'disabled':''} value="${state.selected||''}">`;
+  }
+  let feedback='';
+  if(state.submitted){
+    const ok=submittedInfo.ok;
+    feedback=`<div class="explain-box ${ok?'right':''}"><b>${ok?'정답이에요! 🎉':'아쉬워요! 다시 확인해볼까요?'}</b>${q.e}</div>`;
+  }
+  return `
+  <div class="card">
+    <div class="tag">${catName(q.c)}</div>
+    <div class="meta-row"><span>${state.idx+1} / ${total}</span><span>맞은 개수 ${state.correct}</span></div>
+    <div class="meta-row"><span style="font-weight:700;color:var(--leaf-dark);">${timeDisplay}${isMission?'초 남음(전체)':'초'}</span><span></span></div>
+    <div class="timerbar-outer"><div class="timerbar-inner" style="width:${timePct}%;"></div></div>
+    ${state.mode==='deep' && !state.submitted ? renderLockCountdown(isLocked) : ''}
+    <div class="qtext">Q${state.idx+1}. ${q.q}</div>
+    <div id="choicesWrap">${choicesHtml}</div>
+    ${feedback}
+    ${state.submitted?
+      `<button class="btn btn-primary" id="nextBtn">${state.idx===total-1?'결과 보기':'다음 문제'}</button>`
+      :`<button class="btn btn-primary" id="submitBtn">답안 제출</button>`}
+    <div class="giveup" id="giveupBtn">🚪 그만 풀고 지금까지 점수 낼래요</div>
+  </div>`;
+}
+
+function renderLockCountdown(isLocked){
+  const remain=Math.max(1,Math.ceil((state.lockUntil-Date.now())/1000));
+  if(isLocked){
+    return `<div class="lock-countdown wait" id="lockCountdown"><div class="num">${remain}</div><div>🔒 문제를 꼼꼼히 읽어보세요! (초 후 선택 가능)</div></div>`;
+  }
+  return `<div class="lock-countdown go" id="lockCountdown"><div class="go-emoji">🔓</div><div>이제 보기를 선택할 수 있어요!</div></div>`;
+}
+/* 꼼꼼 정독 모드: 5초 동안 남은 시간을 숫자(5,4,3,2,1)로 문제 위에 크게 실시간으로 보여주고,
+   0초가 되는 순간 선택지 4개의 색이 자동으로 채워지도록 200ms마다 갱신 */
+function updateLockUI(){
+  if(state.mode!=='deep' || state.submitted) return;
+  const el=document.getElementById('lockCountdown');
+  if(!el) return;
+  const remain=Math.max(0,Math.ceil((state.lockUntil-Date.now())/1000));
+  if(remain>0){
+    el.className='lock-countdown wait';
+    el.innerHTML=`<div class="num">${remain}</div><div>🔒 문제를 꼼꼼히 읽어보세요! (초 후 선택 가능)</div>`;
+    document.querySelectorAll('.choice').forEach(c=>c.classList.add('locked'));
+    const si=document.getElementById('shortInput');
+    if(si){si.classList.add('locked');si.disabled=true;}
+  } else {
+    el.className='lock-countdown go';
+    el.innerHTML=`<div class="go-emoji">🔓</div><div>이제 보기를 선택할 수 있어요!</div>`;
+    document.querySelectorAll('.choice').forEach(c=>c.classList.remove('locked'));
+    const si=document.getElementById('shortInput');
+    if(si){si.classList.remove('locked');si.disabled=false;}
+  }
+}
+
+function startTimerForCurrent(){
+  clearInterval(state.timerId);clearInterval(state.missionTimerId);clearInterval(state.lockTimerId);
+  state.timeLeft=60;
+  if(state.mode==='deep'){
+    state.lockUntil=Date.now()+5000;
+    updateLockUI();
+    state.lockTimerId=setInterval(()=>{
+      updateLockUI();
+      if(Date.now()>=state.lockUntil){clearInterval(state.lockTimerId);}
+    },200);
+  }
+  if(state.mode==='mission'){
+    if(!state.missionStarted){
+      state.missionTimeLeft=300;state.missionStarted=true;
+      state.missionTimerId=setInterval(()=>{
+        state.missionTimeLeft--;
+        if(state.missionTimeLeft<=0){clearInterval(state.missionTimerId);finishMissionByTime();return;}
+        const bar=document.querySelector('.timerbar-inner');if(bar)bar.style.width=Math.max(0,state.missionTimeLeft/300*100)+'%';
+        const el=document.querySelector('.meta-row span[style]');if(el)el.textContent=state.missionTimeLeft+'초 남음(전체)';
+      },1000);
+    }
+    return;
+  }
+  state.timerId=setInterval(()=>{
+    state.timeLeft--;
+    if(state.timeLeft<=0){clearInterval(state.timerId);autoSubmitTimeout();return;}
+    const bar=document.querySelector('.timerbar-inner');if(bar)bar.style.width=Math.max(0,state.timeLeft/60*100)+'%';
+    const el=document.querySelector('.meta-row span[style]');if(el)el.textContent=state.timeLeft+'초';
+  },1000);
+}
+
+function finishMissionByTime(){
+  if(!state.submitted){handleSubmit(true);}
+}
+
+function autoSubmitTimeout(){
+  if(!state.submitted){handleSubmit(true);}
+}
+
+function handleSubmit(timeout){
+  clearInterval(state.timerId);
+  const q=currentQ();
+  let ok=false;
+  if(timeout && state.selected==null){
+    ok=false;
+  } else if(q.t==='mcq'){
+    ok=state.selected===q.a;
+  } else {
+    const val=(state.selected||'').toString().trim();
+    ok=val.length>0 && val.replace(/\s/g,'')===q.a.replace(/\s/g,'');
+  }
+  state.submitted=true;
+  state.lastResult={ok};
+  state.answers[q.id]=ok;
+  if(ok){
+    state.correct++;state.combo++;state.maxCombo=Math.max(state.maxCombo,state.combo);
+    if([3,5,10].includes(state.combo)) showCombo(state.combo);
+  } else {
+    state.combo=0;
+    state.wrong.push({id:q.id,q:q.q,your:q.t==='mcq'?(state.selected!=null?q.o[state.selected]:'(제출 안함)'):(state.selected||'(제출 안함)'),correct:q.t==='mcq'?q.o[q.a]:q.a,explain:q.e,cat:q.c});
+  }
+  render();
+}
+
+function showCombo(n){
+  const el=document.getElementById('comboPop');
+  el.textContent=`🔥 ${n}콤보!`;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),1200);
+}
+
+function goNext(){
+  state.idx++;
+  state.selected=null;state.submitted=false;
+  if(state.idx>=state.list.length){
+    finishQuiz();
+    return;
+  }
+  if(state.mode==='focus' && state.idx>0 && state.idx%state.setSize===0){
+    screen='setresult';render();return;
+  }
+  render();
+  startTimerForCurrent();
+}
+
+function renderSetResult(){
+  const doneInSet=Math.min(state.idx,state.list.length);
+  return `
+  <div class="card" style="text-align:center;">
+    <h2 class="card-title">🎯 세트 완료!</h2>
+    <p>지금까지 ${doneInSet}문제 중 ${state.correct}문제를 맞혔어요.</p>
+    <button class="btn btn-primary" id="nextSetBtn">다음 세트 시작</button>
+    <div class="giveup" id="giveupSetBtn" style="margin-top:12px;">🚪 그만 풀고 지금까지 점수 낼래요</div>
+  </div>`;
+}
+
+/* ============ RESULT (채점 로직: 저장 왕복을 병렬화하여 속도 개선) ============ */
+function showLoading(msg){
+  const ov=document.getElementById('modalOverlay');
+  document.getElementById('modalMsg').innerHTML=`<span class="spinner"></span><br>${msg}`;
+  document.getElementById('modalBtns').innerHTML='';
+  ov.classList.remove('hidden');
+}
+function hideLoading(){document.getElementById('modalOverlay').classList.add('hidden');}
+let isFinalizing=false;
+function finishQuiz(){
+  if(isFinalizing) return;
+  isFinalizing=true;
+  clearInterval(state.timerId);clearInterval(state.missionTimerId);clearInterval(state.lockTimerId);
+  showLoading('채점하고 있어요...');
+  finalizeAndShowResult(false).finally(()=>{isFinalizing=false;});
+}
+function giveUp(){
+  if(isFinalizing) return;
+  isFinalizing=true;
+  clearInterval(state.timerId);clearInterval(state.missionTimerId);clearInterval(state.lockTimerId);
+  showLoading('채점하고 있어요...');
+  finalizeAndShowResult(true).finally(()=>{isFinalizing=false;});
+}
+/* 시험 결과 저장을 한 번의 시도로 처리. 실패 시 finalizeAndShowResult에서 여러 번 재시도하거나
+   결과 화면의 '저장 다시 시도' 버튼으로 나중에 다시 호출해도 안전하도록(중복 저장 방지) 설계함.
+   examLogId로 이미 저장된 시도인지 확인해서, 재시도해도 포인트가 중복 지급되거나
+   시험 기록이 중복으로 쌓이지 않아요. */
+async function attemptSaveResult(){
+  // 순서대로(하나씩) 호출: 두 storage 호출을 동시에 보내면 일부 환경에서 조용히 실패했어요.
+  // 읽기(get)는 '데이터 없음'과 '실패'를 구분하지 않고 항상 사용 가능한 값을 즉시 돌려주므로
+  // 여기서 더 이상 실패를 검사하지 않아요. 진짜 성공 여부는 마지막의 저장(set) 결과로 판단해요.
+  const {data:sd}=await getStudentData(state.name);
+  const {data:ed}=await getExamData();
+
+  const alreadyLogged=sd.examLogs.some(l=>l.id===state.lastExamLogId);
+  if(!alreadyLogged){
+    // 저장 용량을 줄이기 위해 문제 텍스트/정답/해설은 저장하지 않고 id와 내가 쓴 답만 저장해요.
+    // (표시할 때는 QUESTIONS에서 id로 다시 찾아와요)
+    state.wrong.forEach(w=>{
+      const exist=sd.wrong.find(x=>x.id===w.id);
+      if(!exist) sd.wrong.push({id:w.id,your:w.your});
+      else exist.your=w.your;
+    });
+    Object.keys(state.answers).forEach(qid=>{
+      if(state.answers[qid]===true) sd.wrong=sd.wrong.filter(w=>w.id!==qid);
+    });
+    sd.examLogs.push({
+      id:state.lastExamLogId, ts:Date.now(), mode:state.mode, score:state.finalScore,
+      correct:state.correct, total:state.finalTotal, answered:state.finalAnswered, complete:!state.giveUp,
+      cats:state.cats.length?state.cats.map(catName).join(','):'전체',
+      wrongList:state.wrong.map(w=>({id:w.id,your:w.your}))
+    });
+    if(sd.examLogs.length>MAX_EXAM_LOGS) sd.examLogs=sd.examLogs.slice(sd.examLogs.length-MAX_EXAM_LOGS);
+
+    sd.profile.points=(sd.profile.points||0)+state.pointsGained;
+    let couponGained=0;
+    while(sd.profile.points>=100){sd.profile.points-=100;sd.profile.coupons=(sd.profile.coupons||0)+1;couponGained++;}
+    sd.profile.level=Math.min(5,1+Math.floor(((sd.profile.coupons*100)+sd.profile.points)/100));
+    state.couponGained=couponGained;
+  }
+  state.profile=sd.profile;
+
+  const alreadyInResults=(ed.results||[]).some(r=>r.examLogId===state.lastExamLogId);
+  if(!alreadyInResults){
+    ed.results.push({
+      id:uid(), examLogId:state.lastExamLogId, name:state.name, ts:Date.now(), score:state.finalScore,
+      correct:state.correct, total:state.finalTotal, answered:state.finalAnswered, complete:!state.giveUp,
+      mode:state.mode, cats:state.cats.length?state.cats.map(catName).join(','):'전체'
+    });
+    ed.hof.push({name:state.name,score:state.finalScore,ts:Date.now()});
+    ed.hof.sort((a,b)=>b.score-a.score||b.ts-a.ts);
+    ed.hof=ed.hof.slice(0,50);
+  }
+
+  const savedStudent=await setStudentData(state.name,sd);
+  if(!savedStudent) return false;
+  const savedExam=await setExamData(ed);
+  return savedExam;
+}
+
+async function finalizeAndShowResult(gaveUp){
+  state.giveUp=gaveUp;
+  const answeredCount=Object.keys(state.answers).length;
+  const totalCount=state.list.length;
+  const score100 = answeredCount>0 ? Math.round((state.correct/answeredCount)*100) : 0;
+  state.finalScore=score100;
+  state.finalAnswered=answeredCount;
+  state.finalTotal=totalCount;
+  state.finalPct=totalCount>0?answeredCount/totalCount:0;
+  state.lastExamLogId=uid();
+  state.pointsGained=(answeredCount>=30 && score100>=90)?10:0;
+  state.couponGained=0;
+
+  // 저장 실패가 단발성 네트워크 문제로 시험 결과 자체를 잃어버리지 않도록,
+  // 실패하면 잠시 기다렸다가 전체 과정을 다시 시도해요 (최대 3번).
+  let saved=false;
+  for(let attempt=0; attempt<3 && !saved; attempt++){
+    if(attempt>0) await wait(1500);
+    saved=await attemptSaveResult();
+  }
+  state.saveFailed=!saved;
+  if(!state.profile) state.profile={points:0,level:1,coupons:0};
+  hideLoading();
+  screen='result';
+  render();
+  if(!saved){
+    // 놓치기 쉬운 작은 경고문구 대신, 확인이 필요한 팝업으로 명확히 알려줌
+    await showAlert('⚠️ 이번 시험 결과가 저장되지 못했어요.\n\n오답모드에서 이 시험의 오답을 보려면, 결과 화면의 "🔄 저장 다시 시도" 버튼을 눌러 주세요.');
+  }
+}
+async function retrySaveResult(){
+  showLoading('저장을 다시 시도하고 있어요...');
+  let saved=false;
+  for(let attempt=0; attempt<3 && !saved; attempt++){
+    if(attempt>0) await wait(1500);
+    saved=await attemptSaveResult();
+  }
+  state.saveFailed=!saved;
+  if(!state.profile) state.profile={points:0,level:1,coupons:0};
+  hideLoading();
+  render();
+  await showAlert(saved?'✅ 저장됐어요! 이제 오답모드에서도 이 시험의 오답을 확인할 수 있어요.':'❌ 이번에도 저장에 실패했어요. 인터넷 연결을 확인한 뒤 잠시 후 다시 시도해 주세요.');
+}
+
+function fanfareTier(score,pct){
+  if(pct<0.6){
+    if(score>=90) return {tier:'f90',msg:'잘했어요! 최고예요! 👏 다음엔 모든 문제를 풀면 더 좋아요!'};
+    if(score>=80) return {tier:'f80',msg:'고생했어요! 🌱 다음엔 모든 문제를 풀면 더 좋아요!'};
+    return null;
+  }
+  if(score>=100) return {tier:'f100',msg:'🎉🎉 당신은 과학 지존! 존경합니다! 🎉🎉'};
+  if(score>=95) return {tier:'f95',msg:'너무너무 잘했어요! 당신은 식물 박사! 🌸'};
+  if(score>=90) return {tier:'f90',msg:'잘했어요! 최고예요! 👏'};
+  if(score>=80) return {tier:'f80',msg:'고생했어요! 🌱'};
+  return null;
+}
+
+function renderResult(){
+  const s=state.finalScore,ans=state.finalAnswered,tot=state.finalTotal,pct=state.finalPct;
+  const fan=fanfareTier(s,pct);
+  const gaugePos=Math.min(100,Math.max(0,s));
+  return `
+  <div class="card" style="text-align:center;">
+    ${state.giveUp?`<div class="warnbox">⚠️ ${tot}문제 중 ${ans}문제만 풀고 제출했어요</div>`:''}
+    ${state.saveFailed?`<div class="warnbox">📡 이번 시험 결과가 아직 저장되지 못했어요. (기존 기록은 안전해요) 아래 버튼으로 다시 시도해 주세요.</div>`:''}
+    <div class="score-big">${s}<span style="font-size:22px;">점</span></div>
+    <div class="score-sub">맞은 개수 ${state.correct} / ${tot} · 정답률 ${ans>0?Math.round(state.correct/ans*100):0}%</div>
+    <div class="gauge"><div class="mark" style="left:${gaugePos}%;"></div></div>
+    <div class="gauge-labels"><span>노력 중</span><span>좋아요</span><span>완벽 마스터</span></div>
+    ${fan?`<div class="fanfare ${fan.tier}">${fan.msg}</div>`:`<div class="fanfare f80">🌱 괜찮아요, 틀린 문제를 다시 보면 금방 늘어요!</div>`}
+    <div class="point-box"><span>이번에 얻은 포인트</span><b>+${state.pointsGained}P</b></div>
+    <div class="level-pill">🌱 Lv.${state.profile.level} ${levelName(state.profile.level)} · 누적 ${state.profile.points}P (쿠폰 ${state.profile.coupons}장)</div>
+    ${state.couponGained>0?`<div class="coupon-toast">🍦 아이스크림 쿠폰이 발급됐어요! (+${state.couponGained}장)</div>`:''}
+    ${state.saveFailed?`<button class="btn btn-primary" id="retrySaveBtn" style="margin-top:14px;">🔄 저장 다시 시도</button>`:''}
+    <button class="btn btn-outline" id="wrongNoteBtn" style="margin-top:16px;">🚫 틀린 문제 오답노트 보기</button>
+    <div class="row2">
+      <button class="btn btn-ghost" id="backHomeBtn">처음으로</button>
+      <button class="btn btn-ghost" id="retryBtn">다시 풀기</button>
+    </div>
+  </div>`;
+}
+function levelName(lv){return ['','새싹 탐구자','뿌리 탐험가','줄기 박사','잎새 마스터','식물 마스터'][lv]||'새싹 탐구자';}
+
+function renderWrongNote(){
+  const items=state.wrong;
+  return `
+  <div class="card" id="printArea">
+    <h2 class="card-title">📝 오답노트 · ${state.name}</h2>
+    <div style="font-size:12px;color:var(--sub);margin:-8px 0 12px;">${fmtDT(Date.now())}</div>
+    ${items.length===0?'<p>이번 시험에서 틀린 문제가 없어요! 완벽해요 🎉</p>':
+    items.map((w,i)=>`<div class="wrongitem"><div class="wq">${i+1}. ${w.q}</div>
+      <div class="wu">내가 쓴 답: ${w.your}</div>
+      <div class="wa">정답: ${w.correct}</div>
+      <div style="font-size:12.5px;color:var(--sub);margin-top:4px;">${w.explain}</div></div>`).join('')}
+  </div>
+  <button class="btn btn-primary" id="pdfBtn">📄 오답노트 PDF 만들기 (저장·인쇄)</button>
+  <div class="small-note">💡 이 시험의 오답은 자동으로 저장돼요. '내 오답노트 모아보기'에서 언제든 다시 확인하고 PDF·인쇄할 수 있어요.</div>
+  <button class="btn btn-ghost" id="backResultBtn" style="margin-top:10px;">결과로 돌아가기</button>
+  `;
+}
+
+/* ============ 오답노트 PDF 생성/인쇄 (html2canvas + jsPDF) ============ */
+/* 모바일 대응(중요): window.open()이나 pdf.save()의 자동(프로그램) 클릭 방식은
+   삼성 인터넷 등 일부 모바일 브라우저에서 새 창이 회색으로 멈추거나 다운로드가
+   조용히 실패하는 문제가 있었어요. 그래서 PDF가 준비되면 학생이 '직접 손가락으로
+   누르는' 진짜 링크 버튼을 화면에 보여주는 방식으로 바꿨어요. 이 방식은 브라우저가
+   막을 수 없는 가장 안정적인 방법이에요. */
+/* 글자 크기 문제(중요): 화면(#printArea)을 모바일 좁은 너비 그대로 캡처해서 A4 전체 폭에
+   늘려 넣다 보니 글자가 실제보다 훨씬 크게 인쇄됐어요. 그래서 PDF를 만들 때는 화면에 보이지
+   않는 곳에 '문서에 어울리는 고정 너비(760px) + 작은 글자 크기'의 인쇄용 사본을 따로 만들어
+   그것을 캡처하도록 바꿨어요. */
+let lastPdfBlobUrl=null;
+let lastPdfFilename=null;
+function buildPrintClone(sourceNode){
+  const clone=document.createElement('div');
+  clone.className='pdf-clone';
+  clone.style.cssText='position:fixed;left:-9999px;top:0;width:760px;background:#ffffff;padding:26px 30px;font-family:"Noto Sans KR",sans-serif;box-sizing:border-box;';
+  const style=document.createElement('style');
+  style.textContent=`
+    .pdf-clone .card-title{font-size:18px;margin:0 0 4px;color:#1b5e20;font-family:Georgia,'Nanum Myeongjo','Batang',serif;}
+    .pdf-clone .wrongitem{border:1px solid #e1ecdd;border-radius:8px;padding:10px 12px;margin-bottom:8px;}
+    .pdf-clone .wq{font-size:12.5px;font-weight:700;margin-bottom:4px;line-height:1.45;color:#26301f;}
+    .pdf-clone .wu{font-size:11px;color:#c0392b;}
+    .pdf-clone .wa{font-size:11px;color:#2e8b57;font-weight:700;}
+    .pdf-clone .wrongitem > div:last-child{font-size:10.5px;color:#6b7a63;margin-top:3px;line-height:1.45;}
+  `;
+  clone.appendChild(style);
+  const inner=document.createElement('div');
+  inner.innerHTML=sourceNode.innerHTML;
+  clone.appendChild(inner);
+  document.body.appendChild(clone);
+  return clone;
+}
+async function generateWrongNotePDF(){
+  const node=document.getElementById('printArea');
+  if(!node) return;
+  if(!window.html2canvas || !(window.jspdf&&window.jspdf.jsPDF)){
+    await showAlert('PDF 기능을 불러오는 중이에요. 인터넷 연결을 확인한 뒤 잠시 후 다시 시도해 주세요.');
+    return;
+  }
+  showLoading('PDF를 만들고 있어요...');
+  let clone=null;
+  try{
+    clone=buildPrintClone(node);
+    await new Promise(r=>setTimeout(r,30)); // 레이아웃이 반영될 시간을 살짝 줌
+    const canvas=await html2canvas(clone,{scale:2,backgroundColor:'#ffffff',useCORS:true,windowWidth:800});
+    const imgData=canvas.toDataURL('image/jpeg',0.92);
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF('p','mm','a4');
+    const pageWidth=pdf.internal.pageSize.getWidth();
+    const pageHeight=pdf.internal.pageSize.getHeight();
+    const imgWidth=pageWidth;
+    const imgHeight=canvas.height*imgWidth/canvas.width;
+    let heightLeft=imgHeight;
+    let position=0;
+    pdf.addImage(imgData,'JPEG',0,position,imgWidth,imgHeight);
+    heightLeft-=pageHeight;
+    while(heightLeft>0){
+      position=heightLeft-imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData,'JPEG',0,position,imgWidth,imgHeight);
+      heightLeft-=pageHeight;
+    }
+    if(lastPdfBlobUrl){ try{URL.revokeObjectURL(lastPdfBlobUrl);}catch(e){} }
+    lastPdfBlobUrl=pdf.output('bloburl');
+    lastPdfFilename=`오답노트_${safeName(state.name)||'학생'}_${fmtDate(Date.now())}.pdf`;
+    hideLoading();
+    showPdfReadyModal();
+  }catch(e){
+    hideLoading();
+    await showAlert('PDF를 만드는 중 문제가 발생했어요. 인터넷 연결을 확인하고 다시 시도해 주세요.');
+  } finally {
+    if(clone && clone.parentNode) clone.parentNode.removeChild(clone);
+  }
+}
+function showPdfReadyModal(){
+  const ov=document.getElementById('modalOverlay');
+  document.getElementById('modalMsg').innerHTML='📄 오답노트 PDF가 준비됐어요!<br>아래 버튼을 <b>직접 눌러서</b> 저장하거나 열어 주세요.';
+  const btns=document.getElementById('modalBtns');
+  btns.style.flexDirection='column';
+  btns.innerHTML=`
+    <a href="${lastPdfBlobUrl}" download="${lastPdfFilename}" class="btn btn-primary" style="margin-bottom:8px;">⬇️ PDF 다운로드</a>
+    <a href="${lastPdfBlobUrl}" class="btn btn-outline" style="margin-bottom:8px;">📄 PDF 열어서 보기 · 인쇄</a>
+    <button class="btn btn-ghost" id="modalCloseBtn">닫기</button>
+  `;
+  ov.classList.remove('hidden');
+  document.getElementById('modalCloseBtn').onclick=()=>{ov.classList.add('hidden');btns.style.flexDirection='';};
+}
+
+/* ============ 오답노트 모아보기 (시험별로 누적 저장된 기록을 언제든 확인) ============ */
+async function showWrongHistoryScreen(){
+  const nameEl=document.getElementById('nameInput');
+  if(nameEl) state.name=nameEl.value.trim();
+  if(!state.name){showAlert('먼저 이름을 입력해 주세요!');return;}
+  if(!safeName(state.name)){showAlert('이름에 특수문자나 공백만 있으면 기록을 찾을 수 없어요. 시험 볼 때와 같은 이름을 입력해 주세요!');return;}
+  const app=document.getElementById('app');
+  app.innerHTML=`<div class="card"><p>불러오는 중...</p></div>`;
+  const {data:sd, failed}=await getStudentData(state.name);
+  if(failed){
+    app.innerHTML=`<div class="card"><p>오답노트를 불러오지 못했어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.</p><button class="btn btn-ghost" id="backHomeBtn" style="margin-top:14px;">돌아가기</button></div>`;
+    document.getElementById('backHomeBtn').onclick=()=>{screen='setup';render();};
+    return;
+  }
+  const logs=(sd.examLogs||[]).slice().reverse();
+  const totalWrong=logs.reduce((s,l)=>s+((l.wrongList&&l.wrongList.length)||0),0);
+  app.innerHTML=`
+  <div class="card">
+    <h2 class="card-title">📚 ${state.name}님의 오답노트 모아보기</h2>
+    ${logs.length===0?'<p>아직 시험 기록이 없어요. 먼저 시험을 봐 주세요!</p>':`
+    <p style="font-size:13px;color:var(--sub);margin-bottom:14px;">지금까지 본 시험 ${logs.length}회 · 누적 오답 ${totalWrong}개</p>
+    ${totalWrong>0?`<button class="btn btn-primary" id="viewAllWrongBtn" style="margin-bottom:16px;">📖 전체 오답 모아서 보기 (중복 없이, PDF·인쇄)</button>`:''}
+    ${logs.map(l=>`<div class="hist-item" data-logid="${l.id}">
+      <div class="hist-top"><span>${fmtDT(l.ts)}</span><span style="color:${l.score>=90?'var(--good)':'var(--leaf-dark)'};">${l.score}점</span></div>
+      <div class="hist-sub">${modeLabel(l.mode)} · ${l.cats} · 틀린 문제 ${(l.wrongList&&l.wrongList.length)||0}개${l.complete?'':' · 중도포기'}</div>
+    </div>`).join('')}
+    `}
+    <button class="btn btn-ghost" id="backHomeBtn" style="margin-top:10px;">돌아가기</button>
+  </div>`;
+  document.getElementById('backHomeBtn').onclick=()=>{screen='setup';render();};
+  const allBtn=document.getElementById('viewAllWrongBtn');
+  if(allBtn){
+    allBtn.onclick=()=>{
+      // 같은 문제가 여러 시험에서 반복해서 틀렸어도 한 번만 보여주고,
+      // 대신 틀린 횟수와 날짜들을 함께 표시 (중복 제거)
+      const map=new Map();
+      logs.slice().reverse().forEach(l=>{ // 오래된 시험부터 순서대로 모음(최근 정보로 갱신되도록)
+        (l.wrongList||[]).forEach(w=>{
+          if(!map.has(w.id)){
+            map.set(w.id,{id:w.id,your:w.your,count:0,dates:[]});
+          }
+          const entry=map.get(w.id);
+          entry.count++;
+          entry.dates.push(fmtDate(l.ts));
+          entry.your=w.your; // 가장 최근에 쓴 답으로 갱신
+        });
+      });
+      const combined=Array.from(map.values()).sort((a,b)=>b.count-a.count||a.id.localeCompare(b.id));
+      showWrongHistoryDetail(`${state.name}님의 전체 누적 오답노트 (중복 제거)`,combined,'combined');
+    };
+  }
+  document.querySelectorAll('.hist-item').forEach(el=>{
+    el.onclick=()=>{
+      const log=logs.find(l=>l.id===el.dataset.logid);
+      if(!log)return;
+      showWrongHistoryDetail(`${state.name}님의 오답노트 · ${fmtDT(log.ts)}`,log.wrongList||[],'single');
+    };
+  });
+}
+function showWrongHistoryDetail(title,items,mode){
+  const app=document.getElementById('app');
+  app.innerHTML=`
+  <div class="card" id="printArea">
+    <h2 class="card-title">📝 ${title}</h2>
+    ${items.length===0?'<p>틀린 문제가 없어요! 완벽해요 🎉</p>':
+    items.map((raw,i)=>{
+      const w=wrongDisplayInfo(raw);
+      return `<div class="wrongitem"><div class="wq">${i+1}. ${w.q}</div>
+      <div class="wu">내가 쓴 답: ${w.your}</div>
+      <div class="wa">정답: ${w.correct}</div>
+      ${mode==='combined'?`<div style="font-size:11px;color:var(--flower-dark);font-weight:700;margin-top:3px;">틀린 횟수: ${raw.count}회 · 날짜: ${raw.dates.join(', ')}</div>`:''}
+      <div style="font-size:12.5px;color:var(--sub);margin-top:4px;">${w.explain}</div></div>`;
+    }).join('')}
+  </div>
+  <button class="btn btn-primary" id="pdfBtn2">📄 오답노트 PDF 만들기 (저장·인쇄)</button>
+  <button class="btn btn-ghost" id="backHistBtn" style="margin-top:10px;">목록으로 돌아가기</button>
+  `;
+  document.getElementById('pdfBtn2').onclick=()=>generateWrongNotePDF();
+  document.getElementById('backHistBtn').onclick=()=>showWrongHistoryScreen();
+}
+
+/* ============ COUPON / HOF (self) ============ */
+async function showCouponScreen(){
+  if(!state.name){showAlert('먼저 이름을 입력해 주세요!');return;}
+  const {data:sd, failed}=await getStudentData(state.name);
+  if(failed){await showAlert('쿠폰함을 불러오지 못했어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.');return;}
+  const profile=sd.profile;
+  const app=document.getElementById('app');
+  app.innerHTML=`
+  <div class="card" style="text-align:center;">
+    <h2 class="card-title">🍦 ${state.name}님의 쿠폰함</h2>
+    <div class="level-pill">Lv.${profile.level} ${levelName(profile.level)}</div>
+    <div class="point-box"><span>누적 포인트</span><b>${profile.points}P / 100P</b></div>
+    <div class="gauge"><div class="mark" style="left:${profile.points}%;"></div></div>
+    <div class="coupon-toast" style="margin-top:16px;">보유 아이스크림 쿠폰: ${profile.coupons||0}장</div>
+    <button class="btn btn-ghost" id="backHomeBtn" style="margin-top:14px;">돌아가기</button>
+  </div>`;
+  document.getElementById('backHomeBtn').onclick=()=>{screen='setup';render();};
+}
+
+async function showHOFScreen(){
+  const {data:ed, failed}=await getExamData();
+  const app=document.getElementById('app');
+  if(failed){
+    app.innerHTML=`<div class="card"><p>명예의 전당을 불러오지 못했어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.</p><button class="btn btn-ghost" id="backHomeBtn" style="margin-top:14px;">돌아가기</button></div>`;
+    document.getElementById('backHomeBtn').onclick=()=>{screen='setup';render();};
+    return;
+  }
+  const hof=ed.hof||[];
+  const top=hof.slice(0,10);
+  app.innerHTML=`
+  <div class="card">
+    <h2 class="card-title">🏆 명예의 전당</h2>
+    ${top.length===0?'<p>아직 기록이 없어요. 첫 번째 도전자가 되어보세요!</p>':
+      top.map((h,i)=>{
+        const rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        return `<div class="hof-row"><div class="hof-rank ${rc}">${i+1}</div><div style="flex:1;">${h.name}</div><b style="color:var(--leaf-dark);">${h.score}점</b></div>`;
+      }).join('')}
+    <button class="btn btn-ghost" id="backHomeBtn" style="margin-top:16px;">돌아가기</button>
+  </div>`;
+  document.getElementById('backHomeBtn').onclick=()=>{screen='setup';render();};
+}
+
+/* ============ TEACHER ============ */
+function renderTeacherLogin(){
+  return `
+  <div class="card" style="text-align:center;">
+    <h2 class="card-title">🔒 강사용 로그인</h2>
+    <input type="text" inputmode="numeric" id="pwInput" placeholder="비밀번호 입력" class="kbdinput">
+    <button class="btn btn-primary" id="pwSubmit">확인</button>
+    <button class="btn btn-ghost" id="pwCancel" style="margin-top:10px;">취소</button>
+  </div>`;
+}
+
+let tdashTab='all';
+async function renderTeacherDashAsync(){
+  const app=document.getElementById('app');
+  app.innerHTML=`<div class="card"><p>불러오는 중...</p></div>`;
+  const {data:ed, failed}=await getExamData();
+  if(failed){
+    app.innerHTML=`<div class="card"><h2 class="card-title">강사용 결과 화면</h2><p>시험 기록을 불러오지 못했어요. 인터넷 연결을 확인한 뒤 아래 버튼으로 다시 시도해 주세요.</p><button class="btn btn-outline" id="retryDashBtn" style="margin-top:10px;">🔄 다시 시도</button><button class="btn btn-ghost" id="backHomeBtn" style="margin-top:10px;">돌아가기</button></div>`;
+    document.getElementById('retryDashBtn').onclick=()=>renderTeacherDashAsync();
+    document.getElementById('backHomeBtn').onclick=()=>{screen='setup';render();};
+    return;
+  }
+  const results=ed.results||[];
+  results.sort((a,b)=>b.ts-a.ts);
+  app.innerHTML=teacherDashHtml(results);
+  bindTeacherEvents(results);
+}
+function teacherDashHtml(results){
+  const tabs=[['all','📋 전체 결과'],['student','🔍 학생별 조회'],['coupon','🍦 쿠폰 관리'],['excel','📊 엑셀/마감']];
+  return `
+  <div class="card">
+    <h2 class="card-title">강사용 결과 화면</h2>
+    <div class="tabbar">${tabs.map(t=>`<div class="tabbtn ${tdashTab===t[0]?'active':''}" data-tab="${t[0]}">${t[1]}</div>`).join('')}</div>
+    <div class="warnbox">⚠️ 이 결과는 이 앱을 여는 모든 사람에게 공개돼요. 이름 대신 별명 사용을 권장해요.</div>
+    <div id="tdashBody">${tdashBodyHtml(results)}</div>
+    <button class="btn btn-outline" id="backHomeBtn" style="margin-top:16px;">돌아가기</button>
+  </div>`;
+}
+function tdashBodyHtml(results){
+  if(tdashTab==='all') return tabAllHtml(results);
+  if(tdashTab==='student') return tabStudentHtml(results);
+  if(tdashTab==='coupon') return tabCouponHtml();
+  if(tdashTab==='excel') return tabExcelHtml(results);
+  return '';
+}
+function tabAllHtml(results){
+  const groups={};
+  results.forEach(r=>{const k=monthKey(r.ts);(groups[k]=groups[k]||[]).push(r);});
+  const keys=Object.keys(groups);
+  return `
+  <div class="row2" style="margin-bottom:10px;">
+    <button class="btn btn-ghost sortBtn" data-sort="new">최신순</button>
+    <button class="btn btn-ghost sortBtn" data-sort="old">오래된순</button>
+  </div>
+  <button class="btn btn-outline" id="refreshBtn">🔄 새로고침</button>
+  ${keys.length===0?'<p style="margin-top:14px;">아직 시험 기록이 없어요.</p>':
+  keys.map(k=>{
+    const rows=groups[k];
+    return `<div class="month-head">${k} (${rows.length}건)</div>
+    <table><tr><th>이름</th><th>점수</th><th>정답률</th><th>진행</th><th>모드</th></tr>
+    ${rows.map(r=>`<tr><td>${r.name}</td><td><b style="color:${r.score>=90?'var(--good)':'var(--leaf-dark)'}">${r.score}/100</b></td>
+      <td>${r.answered>0?Math.round(r.correct/r.answered*100):0}%</td>
+      <td style="color:${r.complete?'var(--good)':'#c0392b'};">${r.complete?'완료':'중도('+r.answered+'/'+r.total+')'}</td>
+      <td>${modeLabel(r.mode)}</td></tr>`).join('')}
+    </table>`;
+  }).join('')}
+  `;
+}
+function modeLabel(m){return {full:'전체',focus:'집중력',deep:'꼼꼼정독',wrong:'오답',mission:'5분미션'}[m]||m;}
+
+function tabStudentHtml(results){
+  return `
+  <input type="text" id="studentSearch" class="kbdinput" placeholder="학생 이름으로 검색">
+  <div id="studentResultArea"><p style="color:var(--sub);font-size:13px;">학생 이름을 입력하면 지금까지 본 모든 시험 점수를 볼 수 있어요.</p></div>
+  `;
+}
+function tabCouponHtml(){
+  return `<input type="text" id="couponSearch" class="kbdinput" placeholder="학생 이름으로 검색 (비우면 전체)">
+  <div id="couponResultArea"><p style="color:var(--sub);font-size:13px;">불러오는 중...</p></div>`;
+}
+function tabExcelHtml(results){
+  return `
+  <p>기간을 골라 엑셀(xlsx) 파일로 내려받아요.</p>
+  <div class="chip-grid" id="excelRangeGrid">
+    <div class="chip active" data-range="all"><b>전체 기간</b></div>
+    <div class="chip" data-range="week"><b>이번 주만</b></div>
+    <div class="chip" data-range="month"><b>이번 달만</b></div>
+    <div class="chip" data-range="semester"><b>이번 학기만</b></div>
+    <div class="chip" data-range="year"><b>올해만</b></div>
+  </div>
+  <button class="btn btn-primary" id="excelDownloadBtn" style="margin-top:14px;">⬇️ 엑셀 다운로드</button>
+  <hr style="margin:22px 0;border:none;border-top:1px solid var(--line);">
+  <div class="warnbox">⚠️ 학기 마감<br>현재까지 쌓인 시험 기록을 전체 엑셀로 저장한 뒤 초기화해요. 포인트·쿠폰·랭킹은 그대로 유지돼요.</div>
+  <button class="btn btn-outline" id="semesterEndBtn" style="border-color:#c0392b;color:#c0392b;">🗑️ 학기 마감하고 기록 초기화</button>
+  `;
+}
+
+function bindTeacherEvents(results){
+  document.getElementById('backHomeBtn').onclick=()=>{screen='setup';render();};
+  document.querySelectorAll('.tabbtn').forEach(el=>{
+    el.onclick=()=>{tdashTab=el.dataset.tab;document.getElementById('tdashBody').innerHTML=tdashBodyHtml(results);bindTabInner(results);};
+  });
+  bindTabInner(results);
+}
+function bindTabInner(results){
+  if(tdashTab==='all'){
+    const rb=document.getElementById('refreshBtn');if(rb)rb.onclick=async()=>{renderTeacherDashAsync();};
+    document.querySelectorAll('.sortBtn').forEach(b=>{
+      b.onclick=()=>{
+        results.sort((a,b2)=>b.dataset.sort==='new'?b2.ts-a.ts:a.ts-b2.ts);
+        document.getElementById('tdashBody').innerHTML=tabAllHtml(results);bindTabInner(results);
+      };
+    });
+  }
+  if(tdashTab==='student'){
+    const inp=document.getElementById('studentSearch');
+    inp.oninput=()=>{
+      const name=inp.value.trim();
+      const area=document.getElementById('studentResultArea');
+      if(!name){area.innerHTML='<p style="color:var(--sub);font-size:13px;">학생 이름을 입력하면 지금까지 본 모든 시험 점수를 볼 수 있어요.</p>';return;}
+      const rows=results.filter(r=>r.name.includes(name)).sort((a,b)=>b.ts-a.ts);
+      area.innerHTML=rows.length===0?'<p>검색 결과가 없어요.</p>':
+        `<table><tr><th>날짜</th><th>점수</th><th>맞은/전체</th><th>진행</th></tr>
+        ${rows.map(r=>`<tr><td>${fmtDT(r.ts)}</td><td>${r.score}점</td><td>${r.correct}/${r.answered}</td><td>${r.complete?'완료':'중도포기'}</td></tr>`).join('')}</table>`;
+    };
+  }
+  if(tdashTab==='coupon'){
+    loadCouponTab();
+    const inp=document.getElementById('couponSearch');
+    inp.oninput=()=>loadCouponTab(inp.value.trim());
+  }
+  if(tdashTab==='excel'){
+    document.querySelectorAll('#excelRangeGrid .chip').forEach(c=>{
+      c.onclick=()=>{document.querySelectorAll('#excelRangeGrid .chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');};
+    });
+    document.getElementById('excelDownloadBtn').onclick=()=>doExcelDownload(results);
+    document.getElementById('semesterEndBtn').onclick=()=>doSemesterEnd(results);
+  }
+}
+async function loadCouponTab(filter){
+  const area=document.getElementById('couponResultArea');
+  if(!area)return;
+  const {data:ed}=await getExamData();
+  const results=ed.results||[];
+  const names=[...new Set(results.map(r=>r.name))].filter(n=>!filter||n.includes(filter));
+  if(names.length===0){area.innerHTML='<p>발급된 쿠폰이 없어요.</p>';return;}
+  // 동시에(병렬로) 여러 학생 데이터를 요청하면 일부 환경에서 조용히 실패할 수 있어
+  // 한 명씩 순서대로 불러와요.
+  const rowsArr=[];
+  for(const n of names){
+    const {data:sd}=await getStudentData(n);
+    rowsArr.push({name:n,...(sd.profile||{points:0,coupons:0,level:1})});
+  }
+  const withCoupon=rowsArr.filter(r=>(r.coupons||0)>0);
+  area.innerHTML=`
+  <table><tr><th>이름</th><th>포인트</th><th>레벨</th><th>쿠폰</th></tr>
+  ${rowsArr.map(r=>`<tr><td>${r.name}</td><td>${r.points}P</td><td>Lv.${r.level}</td><td>${(r.coupons||0)>0?'🍦x'+r.coupons:'-'}</td></tr>`).join('')}
+  </table>
+  ${withCoupon.length>0?`<div class="coupon-toast" style="margin-top:14px;">🍦 쿠폰 대상 학생: ${withCoupon.map(r=>r.name).join(', ')}</div>`:'<p style="margin-top:10px;color:var(--sub);font-size:13px;">아직 쿠폰을 받은 학생이 없어요.</p>'}
+  `;
+}
+function inRange(ts,range){
+  const d=new Date(ts),now=new Date();
+  if(range==='all')return true;
+  if(range==='week'){const start=new Date(now);start.setDate(now.getDate()-now.getDay());start.setHours(0,0,0,0);return ts>=start.getTime();}
+  if(range==='month')return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();
+  if(range==='year')return d.getFullYear()===now.getFullYear();
+  if(range==='semester'){
+    const sem1=now.getMonth()<6;
+    const dsem1=d.getMonth()<6;
+    return d.getFullYear()===now.getFullYear() && dsem1===sem1;
+  }
+  return true;
+}
+function doExcelDownload(results){
+  const active=document.querySelector('#excelRangeGrid .chip.active');
+  const range=active?active.dataset.range:'all';
+  const rows=results.filter(r=>inRange(r.ts,range)).sort((a,b)=>a.ts-b.ts).map(r=>({
+    이름:r.name,날짜:fmtDT(r.ts),점수:r.score,'맞은개수':r.correct,'전체문제':r.total,'푼문제':r.answered,
+    진행:r.complete?'완료':'중도포기',모드:modeLabel(r.mode),범위:r.cats
+  }));
+  if(rows.length===0){showAlert('해당 기간에 데이터가 없어요.');return;}
+  const ws=XLSX.utils.json_to_sheet(rows);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'식물구조기능결과');
+  XLSX.writeFile(wb,`식물탐험대_결과_${range}_${fmtDate(Date.now())}.xlsx`);
+}
+async function doSemesterEnd(results){
+  const ok=await showConfirm('현재까지 기록을 엑셀로 저장한 뒤 초기화할까요? 포인트·쿠폰·랭킹은 유지돼요.');
+  if(!ok)return;
+  doExcelDownload(results);
+  const {data:ed, failed}=await getExamData();
+  if(failed){await showAlert('기록을 불러오지 못해 초기화를 진행하지 않았어요. 다시 시도해 주세요.');return;}
+  ed.results=[];
+  const ok2=await setExamData(ed);
+  if(!ok2){await showAlert('초기화 저장에 실패했어요. 다시 시도해 주세요.');return;}
+  await showAlert('학기가 마감되고 시험 기록이 초기화됐어요.');
+  renderTeacherDashAsync();
+}
+
+/* ============ EVENT BINDING ============ */
+function bindEvents(){
+  if(screen==='setup'){
+    document.getElementById('nameInput').oninput=(e)=>{state.name=e.target.value;};
+    document.querySelectorAll('.chip').forEach(c=>{
+      c.onclick=()=>{
+        const id=c.dataset.cat;
+        if(state.cats.includes(id)) state.cats=state.cats.filter(x=>x!==id);
+        else state.cats.push(id);
+        render();
+      };
+    });
+    document.getElementById('shuffleChk').onchange=(e)=>{state.order=e.target.checked?'shuffle':'seq';};
+    document.querySelectorAll('.mode-card').forEach(m=>{
+      m.onclick=(e)=>{
+        if(e.target.closest('.scope-chip')) return; // 오답 범위 칩 클릭은 모드 카드 클릭과 분리
+        state.mode=m.dataset.mode;render();
+      };
+    });
+    document.querySelectorAll('.scope-chip').forEach(c=>{
+      c.onclick=(e)=>{e.stopPropagation();state.wrongScope=c.dataset.scope;render();};
+    });
+    document.getElementById('missionBtn').onclick=()=>{state.missionStarted=false;startQuiz('mission');};
+    document.getElementById('startBtn').onclick=()=>{state.missionStarted=false;startQuiz(state.mode);};
+    document.getElementById('couponBtn').onclick=()=>{
+      const nameEl=document.getElementById('nameInput');state.name=nameEl.value.trim();
+      showCouponScreen();
+    };
+    document.getElementById('hofBtn').onclick=()=>{showHOFScreen();};
+    document.getElementById('wrongHistoryBtn').onclick=()=>{showWrongHistoryScreen();};
+    document.getElementById('teacherBtn').onclick=()=>{screen='tlogin';render();};
+    document.getElementById('resetMyDataBtn').onclick=async()=>{
+      const nameEl=document.getElementById('nameInput');
+      const nm=(nameEl?nameEl.value:state.name).trim();
+      if(!nm){showAlert('먼저 이름을 입력해 주세요!');return;}
+      const ok=await showConfirm(`"${nm}"님의 오답노트와 포인트·쿠폰 기록을 모두 지울까요? 이 작업은 되돌릴 수 없어요.`);
+      if(!ok)return;
+      showLoading('초기화하고 있어요...');
+      const ok2=await setStudentData(nm,{profile:{points:0,level:1,coupons:0},wrong:[],examLogs:[]});
+      hideLoading();
+      await showAlert(ok2?'초기화됐어요! 이제 새로 시작해 보세요.':'초기화 저장에 실패했어요. 인터넷 연결을 확인하고 다시 시도해 주세요.');
+    };
+    document.getElementById('storageTestBtn').onclick=async()=>{
+      showLoading('저장 기능을 테스트하고 있어요...');
+      const testKey='storagetest_'+APP_KEY;
+      const testVal={ping:Date.now()};
+      let writeOk=false, readOk=false, readBack=null;
+      try{
+        const w=await sset(testKey,testVal);
+        writeOk=w.ok;
+        if(writeOk){
+          const r=await sget(testKey);
+          readOk=!r.failed && r.value && r.value.ping===testVal.ping;
+          readBack=r.value;
+        }
+      }catch(e){}
+      hideLoading();
+      if(writeOk && readOk){
+        await showAlert('✅ 저장 기능이 정상 작동해요!\n\n오답모드가 계속 안 된다면, 실제로 저장된 시험 기록이 없는 경우예요. 시험을 한 번 보고 나서 결과 화면에 저장 실패 경고가 없는지 확인한 뒤, 오답모드를 다시 시도해 주세요.');
+      } else {
+        await showAlert('❌ 저장 기능을 사용할 수 없는 상태예요.\n\n가장 흔한 원인은 이 화면이 "게시(Publish)된 링크"가 아니라 대화창 안 미리보기 화면인 경우예요. 저장 기능은 게시된 공유 링크에서 열었을 때만 동작해요.\n\nClaude 대화에서 이 아티팩트를 "게시" 또는 "공유"한 뒤, 그 링크를 새 탭(또는 QR코드)으로 열어서 다시 시도해 주세요.');
+      }
+    };
+  }
+  else if(screen==='quiz'){
+    if(!state.submitted){
+      document.querySelectorAll('.choice').forEach(c=>{
+        c.onclick=()=>{
+          if(state.mode==='deep' && Date.now()<state.lockUntil){return;}
+          state.selected=parseInt(c.dataset.idx);render();
+        };
+      });
+      const si=document.getElementById('shortInput');
+      if(si) si.oninput=(e)=>{state.selected=e.target.value;};
+      const sb=document.getElementById('submitBtn');
+      if(sb) sb.onclick=async()=>{
+        if(state.mode==='deep' && Date.now()<state.lockUntil){showAlert('아직 5초가 지나지 않았어요!');return;}
+        if(state.selected===null || state.selected===undefined || state.selected===''){
+          const ok=await showConfirm('답을 선택하지 않았어요. 그래도 제출할까요?');
+          if(!ok){return;}
+        }
+        handleSubmit(false);
+      };
+    } else {
+      document.getElementById('nextBtn').onclick=()=>goNext();
+    }
+    document.getElementById('giveupBtn').onclick=async()=>{
+      if(isFinalizing) return;
+      const ok=await showConfirm('정말 그만 풀고 지금까지 점수를 낼까요?');
+      if(ok) giveUp();
+    };
+  }
+  else if(screen==='setresult'){
+    document.getElementById('nextSetBtn').onclick=()=>{render();startTimerForCurrent();};
+    document.getElementById('giveupSetBtn').onclick=async()=>{
+      if(isFinalizing) return;
+      const ok=await showConfirm('정말 그만 풀고 지금까지 점수를 낼까요?');
+      if(ok) giveUp();
+    };
+  }
+  else if(screen==='result'){
+    document.getElementById('wrongNoteBtn').onclick=()=>{screen='wrongnote';render();};
+    document.getElementById('backHomeBtn').onclick=()=>{state=newSession();screen='setup';render();};
+    document.getElementById('retryBtn').onclick=()=>{const nm=state.name;const cats=state.cats;const ord=state.order;const md=state.mode;state=newSession();state.name=nm;state.cats=cats;state.order=ord;state.mode=md;screen='setup';render();};
+    const rsb=document.getElementById('retrySaveBtn');
+    if(rsb) rsb.onclick=()=>retrySaveResult();
+  }
+  else if(screen==='wrongnote'){
+    document.getElementById('pdfBtn').onclick=()=>generateWrongNotePDF();
+    document.getElementById('backResultBtn').onclick=()=>{screen='result';render();};
+  }
+  else if(screen==='tlogin'){
+    document.getElementById('pwSubmit').onclick=()=>{
+      const v=document.getElementById('pwInput').value;
+      if(v===TEACHER_PW){screen='tdash';render();renderTeacherDashAsync();}
+      else showAlert('비밀번호가 틀렸어요.');
+    };
+    document.getElementById('pwCancel').onclick=()=>{screen='setup';render();};
+  }
+}
+
+render();
+</script>
+</body>
+</html>
